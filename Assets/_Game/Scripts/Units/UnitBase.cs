@@ -46,6 +46,7 @@ public class UnitBase : MonoBehaviour, IKillable, IDamageable, IHealth
 
         // 체력 반영
         _currentHealth = resultHealth;
+        Debug.Log("공격받음");
     }
 
     // 유닛의 사망판정을 담당합니다
