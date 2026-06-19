@@ -17,11 +17,23 @@ public class GameRoot : Singleton<GameRoot>
     [SerializeField] private CameraController _cameraController;
     public CameraController CameraController { get => _cameraController; }
 
+    [Header("Controller")]
+    [Tooltip("씬/스테이지 전환 흐름과 페이드 연출을 담당하는 컨트롤러입니다.")]
+    [SerializeField] private StageFlowController _stageFlowController;
+    // 외부에는 구현체가 아닌 인터페이스(IStageFlowService) 계약만 노출합니다.
+    public IStageFlowService StageFlow { get => _stageFlowController; }
+
     //==============================================================================
     // 함수
     //============================================================================== 
     private void Start()
     {
+        // 스테이지 플로우 컨트롤러가 있으면 페이드 캔버스를 초기 상태로 정렬합니다.
+        if (_stageFlowController != null)
+        {
+            _stageFlowController.Init();
+        }
+
         // 카메라 컨트롤러가 없으면 초기화를 진행하지 않습니다.
         if (_cameraController == null)
         {
