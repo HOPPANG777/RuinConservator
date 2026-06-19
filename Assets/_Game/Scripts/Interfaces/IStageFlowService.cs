@@ -19,8 +19,16 @@ public interface IStageFlowService
     /// <summary>
     /// 지정한 스테이지 번호로 전환합니다. (페이드 인 → 이전 씬 언로드 → 새 씬 Additive 로드 → 데이터 복구 → 페이드 아웃)
     /// </summary>
-    /// <param name="stageNumber">전환할 스테이지 번호입니다. (예: 1 → "Stage_001")</param>
+    /// <param name="stageNumber">씬 카탈로그에 등록된 스테이지 번호입니다.</param>
     /// <param name="data">씬 간 보존/전달할 데이터입니다. (스폰 지점, 퍼즐 진행 등)</param>
     /// <returns>전환 파이프라인 완료를 await 할 수 있는 UniTask입니다.</returns>
     UniTask ChangeStageAsync(int stageNumber, SceneTransferData data);
+
+    /// <summary>
+    /// 등록된 씬 ID를 기준으로 일반 씬(타이틀/로비/엔딩 등)으로 전환합니다.
+    /// </summary>
+    /// <param name="sceneId">씬 카탈로그에 등록된 안정적인 씬 ID입니다. (예: "TITLE")</param>
+    /// <param name="data">씬 간 보존/전달할 데이터입니다. 필요 없으면 null을 전달합니다.</param>
+    /// <returns>전환 파이프라인 완료를 await 할 수 있는 UniTask입니다.</returns>
+    UniTask ChangeSceneAsync(string sceneId, SceneTransferData data);
 }

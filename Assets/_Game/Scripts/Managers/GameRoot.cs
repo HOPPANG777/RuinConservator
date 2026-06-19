@@ -31,6 +31,7 @@ public class GameRoot : Singleton<GameRoot>
         // 스테이지 플로우 컨트롤러가 있으면 페이드 캔버스를 초기 상태로 정렬합니다.
         if (_stageFlowController != null)
         {
+            Debug.Log("StageFadeController가 없습니다.");
             _stageFlowController.Init();
         }
 

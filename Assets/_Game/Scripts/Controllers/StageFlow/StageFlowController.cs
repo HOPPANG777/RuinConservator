@@ -18,13 +18,6 @@ using UnityEngine.SceneManagement;
 public class StageFlowController : MonoBehaviour, IStageFlowService
 {
     //==============================================================================
-    // 상수
-    //==============================================================================
-
-    // 스테이지 씬 이름 접두사입니다. (실제 이름 예: Stage_001)
-    private const string STAGE_NAME_PREFIX = "Stage_";
-
-    //==============================================================================
     // 직렬화 필드 (인스펙터 노출)
     //==============================================================================
 
@@ -42,6 +35,11 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
     [Tooltip("시스템 매니저가 상주하는 상시 씬의 이름입니다. (언로드 대상에서 제외)")]
     [SerializeField]
     private string _persistentSceneName = "Scene_Persistent";
+
+    [Header("Scene")]
+    [Tooltip("씬 ID/스테이지 번호와 실제 Unity 씬 이름을 매핑하는 카탈로그입니다.")]
+    [SerializeField]
+    private SceneCatalogSO _sceneCatalog;
 
     //==============================================================================
     // 내부 상태
@@ -96,19 +94,13 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
     //==============================================================================
 
     /// <summary>
-    /// 지정한 스테이지 번호로 전환합니다. (페이드 인 → 언로드 → Additive 로드 → 데이터 복구 → 페이드 아웃)
+    /// 지정한 스테이지 번호로 전환합니다. (카탈로그 조회 → 페이드 인 → 언로드 → Additive 로드 → 데이터 복구 → 페이드 아웃)
     /// </summary>
-    /// <param name="stageNumber">전환할 스테이지 번호입니다. (예: 1 → "Stage_001")</param>
+    /// <param name="stageNumber">전환할 스테이지 번호입니다. 카탈로그에서 실제 씬 이름을 조회합니다.</param>
     /// <param name="data">다음 씬으로 전달/보존할 데이터입니다.</param>
     /// <returns>전환 파이프라인 완료를 await 할 수 있는 UniTask입니다.</returns>
     public async UniTask ChangeStageAsync(int stageNumber, SceneTransferData data)
     {
-        // 전환이 이미 진행 중이면 중복 호출을 막아 경쟁 상태를 방지합니다.
-        if (_isTransitioning)
-        {
-            return;
-        }
-
         // 음수 스테이지 번호는 잘못된 입력이므로 안전하게 차단합니다.
         if (stageNumber < 0)
         {
@@ -116,8 +108,88 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
             return;
         }
 
+        // 씬 카탈로그가 연결되지 않으면 실제 씬 이름을 찾을 수 없으므로 전환을 중단합니다.
+        if (_sceneCatalog == null)
+        {
+            Debug.LogWarning("[StageFlowController] SceneCatalogSO가 연결되지 않았습니다.");
+            return;
+        }
+
+        // 스테이지 번호로 실제 씬 엔트리를 조회합니다.
+        if (!_sceneCatalog.TryGetByStageNumber(stageNumber, out SceneCatalogSO.SceneEntry entry))
+        {
+            Debug.LogWarning($"[StageFlowController] 등록되지 않은 스테이지 번호입니다: {stageNumber}");
+            return;
+        }
+
         // 오브젝트 파괴 시 비동기 흐름이 함께 취소되도록 토큰을 연동합니다.
         CancellationToken token = this.GetCancellationTokenOnDestroy();
+
+        // 스테이지는 상시 씬을 유지한 채 Additive 방식으로 전환합니다.
+        await RunTransitionAsync(entry.SceneName, LoadSceneMode.Additive, data, token);
+    }
+
+    /// <summary>
+    /// 등록된 씬 ID를 기준으로 일반 씬(타이틀/로비/엔딩 등)으로 전환합니다.
+    /// </summary>
+    /// <param name="sceneId">씬 카탈로그에 등록된 안정적인 씬 ID입니다. (예: "TITLE")</param>
+    /// <param name="data">다음 씬으로 전달/보존할 데이터입니다. 필요 없으면 null을 전달합니다.</param>
+    /// <returns>전환 파이프라인 완료를 await 할 수 있는 UniTask입니다.</returns>
+    public async UniTask ChangeSceneAsync(string sceneId, SceneTransferData data)
+    {
+        // 비어 있는 씬 ID는 조회할 수 없으므로 안전하게 차단합니다.
+        if (string.IsNullOrWhiteSpace(sceneId))
+        {
+            Debug.LogWarning("[StageFlowController] 비어 있는 씬 ID로 전환할 수 없습니다.");
+            return;
+        }
+
+        // 씬 카탈로그가 연결되지 않으면 실제 씬 이름을 찾을 수 없으므로 전환을 중단합니다.
+        if (_sceneCatalog == null)
+        {
+            Debug.LogWarning("[StageFlowController] SceneCatalogSO가 연결되지 않았습니다.");
+            return;
+        }
+
+        // 안정적인 씬 ID로 실제 씬 엔트리를 조회합니다.
+        if (!_sceneCatalog.TryGetById(sceneId, out SceneCatalogSO.SceneEntry entry))
+        {
+            Debug.LogWarning($"[StageFlowController] 등록되지 않은 씬 ID입니다: {sceneId}");
+            return;
+        }
+
+        // 오브젝트 파괴 시 비동기 흐름이 함께 취소되도록 토큰을 연동합니다.
+        CancellationToken token = this.GetCancellationTokenOnDestroy();
+
+        // 타이틀/로비/엔딩 같은 일반 씬은 Single 방식으로 전체 교체합니다.
+        await RunTransitionAsync(entry.SceneName, LoadSceneMode.Single, data, token);
+    }
+
+    //==============================================================================
+    // 내부 로직
+    //==============================================================================
+
+    /// <summary>
+    /// 씬 로드 방식에 맞춰 공통 씬 전환 파이프라인을 실행합니다.
+    /// </summary>
+    /// <param name="sceneName">Unity에 등록된 실제 씬 이름입니다.</param>
+    /// <param name="loadMode">씬 로드 방식입니다. 스테이지는 Additive, 일반 씬은 Single을 사용합니다.</param>
+    /// <param name="data">복구에 사용할 전달 데이터입니다.</param>
+    /// <param name="token">취소 토큰입니다.</param>
+    private async UniTask RunTransitionAsync(string sceneName, LoadSceneMode loadMode, SceneTransferData data, CancellationToken token)
+    {
+        // 전환이 이미 진행 중이면 중복 호출을 막아 경쟁 상태를 방지합니다.
+        if (_isTransitioning)
+        {
+            return;
+        }
+
+        // 비어 있는 씬 이름은 Unity 로드 요청이 실패하므로 사전에 차단합니다.
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            Debug.LogWarning("[StageFlowController] 비어 있는 씬 이름으로 전환할 수 없습니다.");
+            return;
+        }
 
         IsTransitioning = true;
 
@@ -126,12 +198,14 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
             // 1) 화면 암전: alpha 0 → 1 보간 대기.
             await FadeAsync(0.0f, 1.0f, token);
 
-            // 2) 이전 씬 해제: 현재 액티브 씬이 상시 씬이 아니라면 언로드합니다.
-            await UnloadActiveStageAsync(token);
+            // 2) Additive 스테이지 전환에서는 현재 액티브 씬이 상시 씬이 아닐 때만 언로드합니다.
+            if (loadMode == LoadSceneMode.Additive)
+            {
+                await UnloadActiveSceneIfNeededAsync(token);
+            }
 
-            // 3) 새 씬 로드: 규칙으로 빌드된 Stage_XXX 이름을 Additive 로드 후 액티브로 지정합니다.
-            string stageSceneName = BuildStageSceneName(stageNumber);
-            await LoadStageAdditiveAsync(stageSceneName, token);
+            // 3) 새 씬 로드: 지정한 로드 방식으로 비동기 로드 후 Additive라면 액티브 씬으로 지정합니다.
+            await LoadSceneAsync(sceneName, loadMode, token);
 
             // 4) 데이터 복구: 새 씬이 완전히 로드된 직후 복구 절차를 실행합니다.
             ExecuteDataRestoration(data);
@@ -146,26 +220,11 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
         }
     }
 
-    //==============================================================================
-    // 내부 로직
-    //==============================================================================
-
-    /// <summary>
-    /// 스테이지 번호로부터 안전하게 씬 이름을 생성합니다. (예: 1 → "Stage_001")
-    /// </summary>
-    /// <param name="stageNumber">스테이지 번호입니다.</param>
-    /// <returns>"Stage_XXX" 형식의 씬 이름 문자열입니다.</returns>
-    private string BuildStageSceneName(int stageNumber)
-    {
-        // 개발자가 문자열을 직접 입력하다 발생하는 오타를 원천 차단하기 위해 코드로 생성합니다.
-        return $"{STAGE_NAME_PREFIX}{stageNumber:D3}";
-    }
-
     /// <summary>
     /// 현재 액티브 씬이 상시 씬이 아니라면 비동기로 언로드합니다.
     /// </summary>
     /// <param name="token">취소 토큰입니다.</param>
-    private async UniTask UnloadActiveStageAsync(CancellationToken token)
+    private async UniTask UnloadActiveSceneIfNeededAsync(CancellationToken token)
     {
         Scene activeScene = SceneManager.GetActiveScene();
 
@@ -181,22 +240,29 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
             return;
         }
 
-        // 이전 스테이지 씬을 비동기로 내리고 완료를 대기합니다.
+        // 이전 액티브 씬을 비동기로 내리고 완료를 대기합니다.
         await SceneManager.UnloadSceneAsync(activeScene).ToUniTask(cancellationToken: token);
     }
 
     /// <summary>
-    /// 지정한 스테이지 씬을 Additive로 로드하고 액티브 씬으로 설정합니다.
+    /// 지정한 씬을 요청한 방식으로 로드하고 Additive 모드라면 액티브 씬으로 설정합니다.
     /// </summary>
-    /// <param name="stageSceneName">로드할 스테이지 씬 이름입니다.</param>
+    /// <param name="sceneName">로드할 씬 이름입니다.</param>
+    /// <param name="loadMode">씬 로드 방식입니다.</param>
     /// <param name="token">취소 토큰입니다.</param>
-    private async UniTask LoadStageAdditiveAsync(string stageSceneName, CancellationToken token)
+    private async UniTask LoadSceneAsync(string sceneName, LoadSceneMode loadMode, CancellationToken token)
     {
-        // 상시 씬을 유지한 채 스테이지 씬만 덧붙이도록 Additive 모드로 로드합니다.
-        await SceneManager.LoadSceneAsync(stageSceneName, LoadSceneMode.Additive).ToUniTask(cancellationToken: token);
+        // 요청한 방식(Single 또는 Additive)으로 씬을 비동기 로드합니다.
+        await SceneManager.LoadSceneAsync(sceneName, loadMode).ToUniTask(cancellationToken: token);
+
+        // Single 모드는 Unity가 자동으로 액티브 씬을 정리하므로 별도 설정이 필요 없습니다.
+        if (loadMode == LoadSceneMode.Single)
+        {
+            return;
+        }
 
         // 방금 로드한 씬을 참조로 가져옵니다.
-        Scene loadedScene = SceneManager.GetSceneByName(stageSceneName);
+        Scene loadedScene = SceneManager.GetSceneByName(sceneName);
 
         // 정상적으로 로드되었을 때만 액티브 씬으로 전환합니다. (라이팅/인스턴스 기준 씬)
         if (loadedScene.IsValid() && loadedScene.isLoaded)
