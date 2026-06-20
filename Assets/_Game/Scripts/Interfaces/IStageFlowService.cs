@@ -17,7 +17,7 @@ public interface IStageFlowService
     bool IsTransitioning { get; }
 
     /// <summary>
-    /// 지정한 스테이지 번호로 전환합니다. (페이드 인 → 이전 씬 언로드 → 새 씬 Additive 로드 → 데이터 복구 → 페이드 아웃)
+    /// 지정한 스테이지 번호로 전환합니다. (페이드 인 → Capture → 이전 씬 언로드 → 새 씬 Additive 로드 → Restore → 페이드 아웃)
     /// </summary>
     /// <param name="stageNumber">씬 카탈로그에 등록된 스테이지 번호입니다.</param>
     /// <param name="data">씬 간 보존/전달할 데이터입니다. (스폰 지점, 퍼즐 진행 등)</param>

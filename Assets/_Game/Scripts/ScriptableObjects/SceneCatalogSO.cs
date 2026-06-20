@@ -156,4 +156,43 @@ public class SceneCatalogSO : ScriptableObject
 
         return false;
     }
+
+    /// <summary>
+    /// Unity 씬 이름과 일치하는 씬 엔트리를 조회합니다.
+    /// </summary>
+    /// <param name="sceneName">Unity에 등록된 실제 씬 이름입니다.</param>
+    /// <param name="entry">조회된 씬 엔트리입니다.</param>
+    /// <returns>일치하는 엔트리가 있으면 true를 반환합니다.</returns>
+    public bool TryGetBySceneName(string sceneName, out SceneEntry entry)
+    {
+        // 출력 값을 먼저 초기화해 실패 경로에서도 안전하게 반환합니다.
+        entry = null;
+
+        // 비어 있는 씬 이름이나 등록 목록이 없으면 조회할 수 없으므로 실패 처리합니다.
+        if (string.IsNullOrWhiteSpace(sceneName) || _entries == null)
+        {
+            return false;
+        }
+
+        // GC 오버헤드를 줄이기 위해 foreach 대신 for문으로 순회합니다.
+        for (int i = 0; i < _entries.Count; i++)
+        {
+            SceneEntry currentEntry = _entries[i];
+
+            // 비어 있는 엔트리는 건너뜁니다.
+            if (currentEntry == null)
+            {
+                continue;
+            }
+
+            // Unity 씬 이름이 일치하는 엔트리를 반환합니다.
+            if (string.Equals(currentEntry.SceneName, sceneName, System.StringComparison.Ordinal))
+            {
+                entry = currentEntry;
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

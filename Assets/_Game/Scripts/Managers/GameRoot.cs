@@ -18,24 +18,48 @@ public class GameRoot : Singleton<GameRoot>
     public CameraController CameraController { get => _cameraController; }
 
     [Header("Controller")]
+    [Tooltip("게임 진행 상태(플래그, 씬 오브젝트 상태)를 보관하는 컨트롤러입니다.")]
+    [SerializeField] private ProgressController _progressController;
+    // 외부에는 구현체가 아닌 인터페이스(IProgressService) 계약만 노출합니다.
+    public IProgressService Progress { get => _progressController; }
+
+    [Header("Controller")]
     [Tooltip("씬/스테이지 전환 흐름과 페이드 연출을 담당하는 컨트롤러입니다.")]
     [SerializeField] private StageFlowController _stageFlowController;
     // 외부에는 구현체가 아닌 인터페이스(IStageFlowService) 계약만 노출합니다.
     public IStageFlowService StageFlow { get => _stageFlowController; }
+
+    [Header("Controller")]
+    [Tooltip("StageFlow Capture/Restore 이벤트와 Progress, 씬 오브젝트를 중개합니다.")]
+    [SerializeField] private SceneStateBridge _sceneStateBridge;
 
     //==============================================================================
     // 함수
     //============================================================================== 
     private void Start()
     {
-        // 스테이지 플로우 컨트롤러가 있으면 페이드 캔버스를 초기 상태로 정렬합니다.
+        // 진행 상태 컨트롤러를 초기화합니다.
+        if (_progressController != null)
+        {
+            _progressController.Init();
+        }
+
+        // 스테이지 플로우 컨트롤러가 있으면 페이드/로딩 UI를 초기 상태로 정렬합니다.
         if (_stageFlowController == null)
         {
             Debug.Log("StageFlowController가 없습니다.");
             return;
         }
 
-        // 카메라 컨트롤러가 없으면 초기화를 진행하지 않습니다.
+        _stageFlowController.Init();
+
+        // Capture/Restore 중개 브릿지를 연결합니다.
+        if (_sceneStateBridge != null && _progressController != null)
+        {
+            _sceneStateBridge.Init(_stageFlowController, _progressController);
+        }
+
+        // 카메라 컨트롤러가 없으면 카메라 초기화만 건너뜁니다.
         if (_cameraController == null)
         {
             Debug.Log("CameraController가 없습니다.");

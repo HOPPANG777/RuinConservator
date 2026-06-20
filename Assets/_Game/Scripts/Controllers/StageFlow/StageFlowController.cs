@@ -6,13 +6,13 @@ using UnityEngine.SceneManagement;
 
 //==============================================================================
 // 기능: class::StageFlowController
-// 설명: 씬 전환 흐름과 페이드 연출만 오케스트레이션하는 독립 컨트롤러
+// 설명: 씬 전환 흐름을 오케스트레이션하는 독립 컨트롤러 (시각 연출은 SceneTransitionPresenter에 위임)
 //==============================================================================
 // NOTE:
 //  - 싱글톤이 아닙니다. 외부 접근은 반드시 GameRoot.Instance.StageFlow(IStageFlowService) 경유.
 //  - 코루틴 금지. 모든 비동기는 UniTask + GetCancellationTokenOnDestroy() 사용.
-//  - 책임 한정: 퍼즐 연산/UI 렌더/플레이어 세부 제어는 본 클래스에 두지 않습니다.
-//    실제 데이터 복구는 이벤트(OnStageRestoreRequested)로 외부에 위임합니다.
+//  - 책임 한정: 퍼즐 연산/UI 렌더/플레이어 세부 상태 제어는 본 클래스에 두지 않습니다.
+//    실제 데이터 Capture/복구는 이벤트(OnStageCaptureRequested, OnStageRestoreRequested)로 외부에 위임합니다.
 //==============================================================================
 [DisallowMultipleComponent]
 public class StageFlowController : MonoBehaviour, IStageFlowService
@@ -21,15 +21,10 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
     // 직렬화 필드 (인스펙터 노출)
     //==============================================================================
 
-    [Header("Fade")]
-    [Tooltip("화면 암전/복귀에 사용하는 페이드용 CanvasGroup입니다.")]
+    [Header("Transition")]
+    [Tooltip("씬 전환 시 시각적 연출(페이드, 로딩 UI)을 담당하는 Presenter입니다.")]
     [SerializeField]
-    private CanvasGroup _fadeCanvasGroup;
-
-    [Header("Fade")]
-    [Tooltip("페이드 인/아웃 한 방향에 걸리는 시간(초)입니다.")]
-    [SerializeField]
-    private float _fadeDuration = 0.5f;
+    private SceneTransitionPresenter _sceneTransitionPresenter;
 
     [Header("Scene")]
     [Tooltip("시스템 매니저가 상주하는 상시 씬의 이름입니다. (언로드 대상에서 제외)")]
@@ -48,6 +43,12 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
     // 현재 전환 파이프라인이 진행 중인지 여부를 담는 내부 플래그입니다.
     private bool _isTransitioning;
 
+    // 시각 연출 서비스에 대한 캐시 참조입니다. (인터페이스 경유 접근용)
+    private ISceneTransitionService _sceneTransition;
+
+    // 현재 로드되어 있는 스테이지 번호입니다. 스테이지가 없으면 -1입니다.
+    private int _currentStageNumber = -1;
+
     //==============================================================================
     // 프로퍼티
     //==============================================================================
@@ -59,9 +60,20 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
         private set => _isTransitioning = value;
     }
 
+    /// <summary>현재 로드되어 있는 스테이지 번호입니다. 없으면 -1입니다.</summary>
+    public int CurrentStageNumber
+    {
+        get => _currentStageNumber;
+    }
+
     //==============================================================================
-    // 이벤트 (데이터 복구 위임)
+    // 이벤트 (데이터 Capture/복구 위임)
     //==============================================================================
+
+    /// <summary>
+    /// 스테이지 언로드 직전 현재 씬 상태를 저장해야 할 때 발생하는 이벤트입니다.
+    /// </summary>
+    public event Action<int> OnStageCaptureRequested;
 
     /// <summary>
     /// 새 스테이지 로드 직후 데이터 복구가 필요할 때 발생하는 이벤트입니다.
@@ -70,23 +82,33 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
     public event Action<SceneTransferData> OnStageRestoreRequested;
 
     //==============================================================================
+    // 유니티 생명주기
+    //==============================================================================
+
+    /// <summary>
+    /// 직렬화된 Presenter 참조를 인터페이스 멤버로 캐시합니다.
+    /// </summary>
+    private void Awake()
+    {
+        _sceneTransition = _sceneTransitionPresenter;
+    }
+
+    //==============================================================================
     // 초기화
     //==============================================================================
 
     /// <summary>
-    /// GameRoot에서 호출하는 초기화 함수입니다. 페이드 캔버스를 투명 상태로 정렬합니다.
+    /// GameRoot에서 호출하는 초기화 함수입니다. Presenter의 페이드/로딩 UI를 초기 상태로 정렬합니다.
     /// </summary>
     public void Init()
     {
-        // 페이드 캔버스가 연결되지 않았다면 초기화할 대상이 없으므로 종료합니다.
-        if (_fadeCanvasGroup == null)
+        // Presenter가 연결되지 않았으면 초기화할 대상이 없으므로 종료합니다.
+        if (_sceneTransition == null)
         {
             return;
         }
 
-        // 시작 시점에는 화면이 보여야 하므로 완전 투명 + 입력 통과 상태로 둡니다.
-        _fadeCanvasGroup.alpha = 0.0f;
-        _fadeCanvasGroup.blocksRaycasts = false;
+        _sceneTransition.Init();
     }
 
     //==============================================================================
@@ -126,7 +148,7 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
         CancellationToken token = this.GetCancellationTokenOnDestroy();
 
         // 스테이지는 상시 씬을 유지한 채 Additive 방식으로 전환합니다.
-        await RunTransitionAsync(entry.SceneName, LoadSceneMode.Additive, data, token);
+        await RunTransitionAsync(entry.SceneName, LoadSceneMode.Additive, data, stageNumber, token);
     }
 
     /// <summary>
@@ -162,7 +184,7 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
         CancellationToken token = this.GetCancellationTokenOnDestroy();
 
         // 타이틀/로비/엔딩 같은 일반 씬은 Single 방식으로 전체 교체합니다.
-        await RunTransitionAsync(entry.SceneName, LoadSceneMode.Single, data, token);
+        await RunTransitionAsync(entry.SceneName, LoadSceneMode.Single, data, -1, token);
     }
 
     //==============================================================================
@@ -175,8 +197,14 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
     /// <param name="sceneName">Unity에 등록된 실제 씬 이름입니다.</param>
     /// <param name="loadMode">씬 로드 방식입니다. 스테이지는 Additive, 일반 씬은 Single을 사용합니다.</param>
     /// <param name="data">복구에 사용할 전달 데이터입니다.</param>
+    /// <param name="destinationStageNumber">Additive 전환 시 목적지 스테이지 번호입니다. 해당 없으면 -1입니다.</param>
     /// <param name="token">취소 토큰입니다.</param>
-    private async UniTask RunTransitionAsync(string sceneName, LoadSceneMode loadMode, SceneTransferData data, CancellationToken token)
+    private async UniTask RunTransitionAsync(
+        string sceneName,
+        LoadSceneMode loadMode,
+        SceneTransferData data,
+        int destinationStageNumber,
+        CancellationToken token)
     {
         // 전환이 이미 진행 중이면 중복 호출을 막아 경쟁 상태를 방지합니다.
         if (_isTransitioning)
@@ -191,27 +219,48 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
             return;
         }
 
+        // Presenter가 연결되지 않았으면 시각 연출 없이 전환할 수 없으므로 중단합니다.
+        if (_sceneTransition == null)
+        {
+            Debug.LogWarning("[StageFlowController] SceneTransitionPresenter가 연결되지 않았습니다.");
+            return;
+        }
+
         IsTransitioning = true;
 
         try
         {
-            // 1) 화면 암전: alpha 0 → 1 보간 대기.
-            await FadeAsync(0.0f, 1.0f, token);
+            // 1) 화면 암전: alpha 0 → 1 (로딩 UI는 아직 비활성).
+            await _sceneTransition.FadeInAsync(token);
 
-            // 2) Additive 스테이지 전환에서는 현재 액티브 씬이 상시 씬이 아닐 때만 언로드합니다.
+            // 2) Additive 스테이지 전환: 떠나기 전 현재 스테이지 상태를 Capture합니다.
             if (loadMode == LoadSceneMode.Additive)
             {
+                ExecuteStageCapture();
                 await UnloadActiveSceneIfNeededAsync(token);
             }
 
-            // 3) 새 씬 로드: 지정한 로드 방식으로 비동기 로드 후 Additive라면 액티브 씬으로 지정합니다.
-            await LoadSceneAsync(sceneName, loadMode, token);
+            // 3) 새 씬 로드: AsyncOperation을 Presenter가 모니터링하며 로딩 UI를 단계적으로 노출합니다.
+            AsyncOperation loadOperation = SceneManager.LoadSceneAsync(sceneName, loadMode);
+            await _sceneTransition.MonitorTransitionAsync(loadOperation, token);
 
-            // 4) 데이터 복구: 새 씬이 완전히 로드된 직후 복구 절차를 실행합니다.
-            ExecuteDataRestoration(data);
+            // Additive 모드라면 방금 로드한 씬을 액티브 씬으로 지정합니다.
+            if (loadMode == LoadSceneMode.Additive)
+            {
+                SetActiveSceneIfLoaded(sceneName);
+            }
 
-            // 5) 화면 복귀: alpha 1 → 0 보간 대기.
-            await FadeAsync(1.0f, 0.0f, token);
+            // 4) Additive 전환 시 현재 스테이지 번호를 갱신합니다.
+            if (loadMode == LoadSceneMode.Additive && destinationStageNumber >= 0)
+            {
+                _currentStageNumber = destinationStageNumber;
+            }
+
+            // 5) 데이터 복구: 새 씬이 완전히 로드된 직후 복구 절차를 실행합니다.
+            ExecuteDataRestoration(data, destinationStageNumber);
+
+            // 6) 화면 복귀: alpha 1 → 0.
+            await _sceneTransition.FadeOutAsync(token);
         }
         finally
         {
@@ -240,28 +289,17 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
             return;
         }
 
-        // 이전 액티브 씬을 비동기로 내리고 완료를 대기합니다.
-        await SceneManager.UnloadSceneAsync(activeScene).ToUniTask(cancellationToken: token);
+        // 이전 액티브 씬을 비동기로 내리고, 긴 언로드 시 Presenter가 로딩 UI를 표시합니다.
+        AsyncOperation unloadOperation = SceneManager.UnloadSceneAsync(activeScene);
+        await _sceneTransition.MonitorTransitionAsync(unloadOperation, token);
     }
 
     /// <summary>
-    /// 지정한 씬을 요청한 방식으로 로드하고 Additive 모드라면 액티브 씬으로 설정합니다.
+    /// 지정한 이름의 씬이 로드되어 있으면 액티브 씬으로 설정합니다.
     /// </summary>
-    /// <param name="sceneName">로드할 씬 이름입니다.</param>
-    /// <param name="loadMode">씬 로드 방식입니다.</param>
-    /// <param name="token">취소 토큰입니다.</param>
-    private async UniTask LoadSceneAsync(string sceneName, LoadSceneMode loadMode, CancellationToken token)
+    /// <param name="sceneName">액티브로 지정할 씬 이름입니다.</param>
+    private void SetActiveSceneIfLoaded(string sceneName)
     {
-        // 요청한 방식(Single 또는 Additive)으로 씬을 비동기 로드합니다.
-        await SceneManager.LoadSceneAsync(sceneName, loadMode).ToUniTask(cancellationToken: token);
-
-        // Single 모드는 Unity가 자동으로 액티브 씬을 정리하므로 별도 설정이 필요 없습니다.
-        if (loadMode == LoadSceneMode.Single)
-        {
-            return;
-        }
-
-        // 방금 로드한 씬을 참조로 가져옵니다.
         Scene loadedScene = SceneManager.GetSceneByName(sceneName);
 
         // 정상적으로 로드되었을 때만 액티브 씬으로 전환합니다. (라이팅/인스턴스 기준 씬)
@@ -272,72 +310,46 @@ public class StageFlowController : MonoBehaviour, IStageFlowService
     }
 
     /// <summary>
-    /// 새 스테이지 로드 직후 데이터 복구 절차를 실행하는 구조적 뼈대입니다.
+    /// 스테이지 언로드 직전 현재 스테이지 상태 Capture 절차를 실행합니다.
     /// </summary>
-    /// <param name="data">복구에 사용할 전달 데이터입니다.</param>
-    private void ExecuteDataRestoration(SceneTransferData data)
+    private void ExecuteStageCapture()
     {
-        // 전달 데이터가 없으면 복구할 내용이 없으므로 종료합니다.
-        if (data == null)
+        // 현재 스테이지가 없으면 Capture할 대상이 없습니다.
+        if (_currentStageNumber < 0)
         {
             return;
         }
 
-        // 실제 복구 로직(새 씬의 스폰 포인트를 targetSpawnPointId로 찾아 플레이어를 배치하고,
-        // currentKeyCount 등 퍼즐 상태를 적용하는 작업)은 본 컨트롤러의 책임이 아닙니다.
-        // 결합도를 낮추기 위해 구독자(외부 시스템)에게 이벤트로 위임합니다.
-        OnStageRestoreRequested?.Invoke(data);
+        OnStageCaptureRequested?.Invoke(_currentStageNumber);
     }
 
     /// <summary>
-    /// CanvasGroup의 alpha를 from에서 to로 보간하는 순수 비동기 페이드 타이머입니다. (Update 미사용)
+    /// 새 스테이지 로드 직후 데이터 복구 절차를 실행합니다.
     /// </summary>
-    /// <param name="from">시작 alpha 값입니다.</param>
-    /// <param name="to">목표 alpha 값입니다.</param>
-    /// <param name="token">취소 토큰입니다.</param>
-    private async UniTask FadeAsync(float from, float to, CancellationToken token)
+    /// <param name="data">복구에 사용할 전달 데이터입니다.</param>
+    /// <param name="destinationStageNumber">목적지 스테이지 번호입니다.</param>
+    private void ExecuteDataRestoration(SceneTransferData data, int destinationStageNumber)
     {
-        // 페이드 캔버스가 없으면 연출을 건너뜁니다.
-        if (_fadeCanvasGroup == null)
+        // Additive 스테이지 전환이 아니면 Restore 이벤트를 발생시키지 않습니다.
+        if (destinationStageNumber < 0)
         {
             return;
         }
 
-        // 페이드 중에는 뒤쪽 UI 입력을 가로채도록 레이캐스트를 켭니다.
-        _fadeCanvasGroup.blocksRaycasts = true;
-        _fadeCanvasGroup.alpha = from;
-
-        // 지속 시간이 0 이하이면 즉시 목표 값으로 스냅 처리합니다.
-        if (_fadeDuration <= 0.0f)
+        // handoff 데이터가 없으면 목적지 스테이지 번호만 담은 임시 데이터를 생성합니다.
+        if (data == null)
         {
-            _fadeCanvasGroup.alpha = to;
-        }
-        else
-        {
-            float elapsed = 0.0f;
-
-            // Update 메시지 대신 UniTask 루프로 매 프레임 alpha를 보간합니다.
-            while (elapsed < _fadeDuration)
-            {
-                // 현재 프레임에서 흐른 시간을 누적합니다.
-                elapsed += Time.deltaTime;
-
-                // 0~1 진행도로 정규화한 뒤 선형 보간으로 alpha를 갱신합니다.
-                float t = Mathf.Clamp01(elapsed / _fadeDuration);
-                _fadeCanvasGroup.alpha = Mathf.Lerp(from, to, t);
-
-                // 다음 Update 타이밍까지 양보합니다. (네이티브-매니지드 전환 오버헤드 없음)
-                await UniTask.Yield(PlayerLoopTiming.Update, token);
-            }
-
-            // 누적 오차를 제거하기 위해 마지막에 목표 값으로 확정합니다.
-            _fadeCanvasGroup.alpha = to;
+            data = new SceneTransferData();
         }
 
-        // 완전 투명(화면 복귀)일 때는 입력을 다시 통과시킵니다.
-        if (Mathf.Approximately(to, 0.0f))
+        // enteringStageNumber가 비어 있으면 목적지 스테이지 번호로 채웁니다.
+        if (data.enteringStageNumber < 0)
         {
-            _fadeCanvasGroup.blocksRaycasts = false;
+            data.enteringStageNumber = destinationStageNumber;
         }
+
+        // 실제 복구 로직은 본 컨트롤러의 책임이 아닙니다.
+        // 결합도를 낮추기 위해 구독자(SceneStateBridge 등)에게 이벤트로 위임합니다.
+        OnStageRestoreRequested?.Invoke(data);
     }
 }
