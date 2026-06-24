@@ -508,21 +508,25 @@ UniTask ChangeSceneAsync(string sceneId, SceneTransferData data);  // 타이틀 
 
 ```
 Assets/_Game/Scripts/
-├── Interfaces/
-│   ├── IProgressService.cs
-│   └── ISceneStateContributor.cs
-├── Controllers/
+├── Core/
+│   └── Bootstrap/
+│       └── GameRoot.cs
+├── Systems/
 │   ├── Progress/
+│   │   ├── Contracts/
+│   │   │   └── IProgressService.cs
 │   │   └── ProgressController.cs
-│   └── StageFlow/
+│   └── SceneFlow/
+│       ├── Contracts/
+│       │   └── ISceneStateContributor.cs
+│       ├── Data/
+│       │   ├── SceneCatalogSO.cs
+│       │   └── SceneTransferData.cs
 │       ├── StageFlowController.cs
 │       └── SceneStateBridge.cs
-├── Data/
-│   └── SceneTransferData.cs
-├── World/
-│   └── SpawnPoint.cs
-└── Managers/
-    └── GameRoot.cs
+└── Gameplay/
+    └── World/
+        └── SpawnPoint.cs
 ```
 
 ---

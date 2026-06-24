@@ -18,6 +18,7 @@
   <Project Path="Unity.InputSystem.csproj" />
   <Project Path="Unity.2D.Animation.Editor.csproj" />
   <Project Path="UniTask.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Unity.Searcher.Editor.csproj" />
   <Project Path="Unity.2D.SpriteShape.Runtime.csproj" />
   <Project Path="Unity.VisualScripting.Core.csproj" />
@@ -28,7 +29,6 @@
   <Project Path="Unity.Splines.Editor.csproj" />
   <Project Path="Unity.PerformanceTesting.csproj" />
   <Project Path="Unity.2D.Tilemap.Extras.Editor.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="UniTask.Linq.csproj" />
   <Project Path="PsdPlugin.csproj" />
   <Project Path="Unity.2D.IK.Editor.csproj" />
