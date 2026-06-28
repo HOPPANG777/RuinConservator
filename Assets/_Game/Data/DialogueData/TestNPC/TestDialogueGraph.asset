@@ -25,4 +25,9 @@ MonoBehaviour:
     _actorOverride: {fileID: 11400000, guid: fb1303c0a9b1d34498f455456a56d9da, type: 2}
     _bodyText: "\uB09C TestNPC\uB2E4"
     _nextNodeId: 
-    _choices: []
+    _choices:
+    - _choiceText: "\uD018\uC2A4\uD2B8 \uC218\uB77D"
+      _nextNodeId: 
+      _actionType: 3
+      _actionId: TESTQUEST
+      _questData: {fileID: 11400000, guid: e92b88356cb182946ac4e5ca2715ae89, type: 2}

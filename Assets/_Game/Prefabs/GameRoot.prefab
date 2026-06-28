@@ -754,7 +754,6 @@ GameObject:
   - component: {fileID: 1218226878240492035}
   - component: {fileID: 2935677695423474975}
   - component: {fileID: 3670218747204186957}
-  - component: {fileID: 719670310172971253}
   m_Layer: 0
   m_Name: DialogueCanvas
   m_TagString: Untagged
@@ -775,7 +774,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2238528513778599152}
-  m_Father: {fileID: 7931641653590673891}
+  m_Father: {fileID: 4007020922007439524}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -845,18 +844,68 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!225 &719670310172971253
-CanvasGroup:
+--- !u!1 &3248521256341426402
+GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3012066989187130478}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5251218890341377323}
+  - component: {fileID: 7245587601327126909}
+  m_Layer: 0
+  m_Name: ChoiceRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &5251218890341377323
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3248521256341426402}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7111320104658084541}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 500, y: 130}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &7245587601327126909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3248521256341426402}
   m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &3696590858454879817
 GameObject:
   m_ObjectHideFlags: 0
@@ -1239,8 +1288,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 8935092819709880471}
+  m_Children: []
   m_Father: {fileID: 2305819821877646456}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4432123089562803381
@@ -1614,6 +1662,7 @@ RectTransform:
   - {fileID: 3018307439909223835}
   - {fileID: 7059711917902246580}
   - {fileID: 5026441565212997400}
+  - {fileID: 5251218890341377323}
   m_Father: {fileID: 2238528513778599152}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -1669,6 +1718,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4007020922007439524}
   - component: {fileID: 3872903375073207988}
+  - component: {fileID: 9105413816234761682}
   m_Layer: 0
   m_Name: DialogueView
   m_TagString: Untagged
@@ -1688,7 +1738,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 8935092819709880471}
   m_Father: {fileID: 6437377060958127316}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3872903375073207988
@@ -1703,13 +1754,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d306af987fe40b8aa90c6229cef7bcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueView
-  _rootCanvasGroup: {fileID: 719670310172971253}
+  _rootCanvasGroup: {fileID: 9105413816234761682}
   _portraitImage: {fileID: 6526354378835029838}
   _hidePortraitWhenEmpty: 1
   _speakerNameText: {fileID: 3145432195281192065}
   _bodyText: {fileID: 2643634163906427819}
-  _choiceRoot: {fileID: 0}
-  _choiceButtonPrefab: {fileID: 0}
+  _choiceRoot: {fileID: 5251218890341377323}
+  _choiceButtonPrefab: {fileID: 3162677232201257129, guid: 5b236a51a9813a74a831c1340b470250, type: 3}
+--- !u!225 &9105413816234761682
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7461177156810791407}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &8165559269491693302
 GameObject:
   m_ObjectHideFlags: 0
