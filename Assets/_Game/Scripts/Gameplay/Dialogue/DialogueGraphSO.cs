@@ -10,6 +10,10 @@ public enum DialogueChoiceActionType
     NONE = 0,
     SET_PROGRESS_FLAG_TRUE,
     SET_PROGRESS_FLAG_FALSE,
+    ACCEPT_QUEST,
+    REFRESH_QUEST_PROGRESS,
+    COMPLETE_QUEST,
+    CLAIM_QUEST_REWARD,
     END_DIALOGUE
 }
 
@@ -40,9 +44,14 @@ public class DialogueChoiceData
     private DialogueChoiceActionType _actionType;
 
     [Header("Action")]
-    [Tooltip("액션에서 사용할 ID입니다. Progress Flag 액션에서는 flagId로 사용합니다.")]
+    [Tooltip("액션에서 사용할 ID입니다. Progress Flag 액션에서는 flagId, Quest 액션에서는 questId로 사용합니다.")]
     [SerializeField]
     private string _actionId;
+
+    [Header("Action")]
+    [Tooltip("Quest 액션에서 직접 사용할 퀘스트 데이터입니다. 비워두면 Action Id를 questId로 사용합니다.")]
+    [SerializeField]
+    private QuestDataSO _questData;
 
     //==============================================================================
     // 공개 프로퍼티
@@ -59,6 +68,9 @@ public class DialogueChoiceData
 
     /// <summary>선택 시 실행할 액션 ID입니다.</summary>
     public string ActionId => _actionId;
+
+    /// <summary>Quest 액션에서 직접 사용할 퀘스트 데이터입니다.</summary>
+    public QuestDataSO QuestData => _questData;
 }
 
 //==============================================================================

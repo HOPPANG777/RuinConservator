@@ -54,7 +54,7 @@ public class CameraController : MonoBehaviour
     //============================================================================== 
     private void Update()
     {
-        if (_isInit == true) return;
+        if (_isInit == false) return;
 
         // 임시 포커스가 진행 중이면 남은 시간을 매 프레임 갱신합니다.
         UpdateFocusTimer();
@@ -62,6 +62,8 @@ public class CameraController : MonoBehaviour
 
     public void Init()
     {
+        ResolveDefaultTargetIfNeeded();
+
         // 게임 시작 시 카메라가 기본 추적 대상을 따라가도록 초기화합니다.
         RestoreDefaultTarget();
         _isInit = true;
@@ -92,7 +94,7 @@ public class CameraController : MonoBehaviour
     public void Focus(ICameraTarget target)
     {
         // 전달받은 타겟이 없거나, 타겟 오브젝트가 없으면 포커스할 수 없으므로 종료합니다.
-        if (target == null || target.CameraTarget == null)
+        if (target == null || target.CameraTarget == null || _focusCamera == null || _followCamera == null)
         {
             return;
         }
@@ -135,8 +137,10 @@ public class CameraController : MonoBehaviour
     // 카메라를 기본 추적 대상으로 되돌립니다.
     public void RestoreDefaultTarget()
     {
+        ResolveDefaultTargetIfNeeded();
+
         // 기본 추적 대상이 없으면 되돌릴 대상이 없으므로 종료합니다.
-        if (_defaultTarget == null)
+        if (_defaultTarget == null || _followCamera == null)
         {
             return;
         }
@@ -148,13 +152,34 @@ public class CameraController : MonoBehaviour
         _followCamera.Follow = targetTransform;
 
         // 포커스 카메라의 우선순위를 낮춰 비활성 카메라처럼 동작하게 합니다.
-        _focusCamera.Priority = 0;
+        if (_focusCamera != null)
+        {
+            _focusCamera.Priority = 0;
+        }
 
         // 기본 추적 카메라의 우선순위를 복구해 활성 카메라가 되도록 합니다.
         _followCamera.Priority = _followPriority;
 
         // 임시 포커스 상태를 종료합니다.
         _isFocusing = false;
+    }
+
+    // 기본 추적 대상이 비어 있으면 현재 씬의 플레이어를 찾아 자동으로 연결합니다.
+    private void ResolveDefaultTargetIfNeeded()
+    {
+        if (_defaultTarget != null)
+        {
+            return;
+        }
+
+        UnitPlayer player = Object.FindFirstObjectByType<UnitPlayer>();
+
+        if (player == null || player.CameraTarget == null)
+        {
+            return;
+        }
+
+        _defaultTarget = player.CameraTarget;
     }
 
     // 임시 포커스 시간을 갱신합니다.

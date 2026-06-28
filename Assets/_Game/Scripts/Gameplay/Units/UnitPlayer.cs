@@ -15,7 +15,18 @@ public class UnitPlayer : UnitBase, ICameraTarget
     [Header("CameraTarget")]
     [Tooltip("플레이어는 카메라가 추적할 타겟입니다.")]
     [SerializeField] private GameObject _cameraTarget;
-    public GameObject CameraTarget { get => _cameraTarget; }
+    public GameObject CameraTarget
+    {
+        get
+        {
+            if (_cameraTarget != null)
+            {
+                return _cameraTarget;
+            }
+
+            return gameObject;
+        }
+    }
 
     //==============================================================================
     // 함수

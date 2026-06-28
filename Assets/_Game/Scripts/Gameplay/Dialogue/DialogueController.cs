@@ -56,6 +56,9 @@ public class DialogueController : MonoBehaviour, IDialogueService
     // 현재 대화창이 열려 있는지 여부입니다.
     private bool _isDialogueOpen;
 
+    // 대화 진행 액션이 다른 시스템에서 켜진 액션인지 구분하기 위한 플래그입니다.
+    private bool _didEnableAdvanceAction;
+
     //==============================================================================
     // 공개 프로퍼티
     //==============================================================================
@@ -81,6 +84,30 @@ public class DialogueController : MonoBehaviour, IDialogueService
     //==============================================================================
     // 유니티 생명주기
     //==============================================================================
+
+    /// <summary>
+    /// 다음 대사 입력을 감지합니다.
+    /// </summary>
+    private void OnEnable()
+    {
+        if (_advanceAction == null || _advanceAction.action == null || _advanceAction.action.enabled)
+        {
+            return;
+        }
+
+        _advanceAction.action.Enable();
+        _didEnableAdvanceAction = true;
+    }
+
+    private void OnDisable()
+    {
+        if (_didEnableAdvanceAction && _advanceAction != null && _advanceAction.action != null)
+        {
+            _advanceAction.action.Disable();
+        }
+
+        _didEnableAdvanceAction = false;
+    }
 
     /// <summary>
     /// 다음 대사 입력을 감지합니다.
@@ -311,6 +338,22 @@ public class DialogueController : MonoBehaviour, IDialogueService
             case DialogueChoiceActionType.SET_PROGRESS_FLAG_FALSE:
                 SetProgressFlag(choice.ActionId, false);
                 break;
+
+            case DialogueChoiceActionType.ACCEPT_QUEST:
+                AcceptQuest(choice);
+                break;
+
+            case DialogueChoiceActionType.REFRESH_QUEST_PROGRESS:
+                RefreshQuestProgress(choice);
+                break;
+
+            case DialogueChoiceActionType.COMPLETE_QUEST:
+                CompleteQuest(choice);
+                break;
+
+            case DialogueChoiceActionType.CLAIM_QUEST_REWARD:
+                ClaimQuestReward(choice);
+                break;
         }
     }
 
@@ -333,6 +376,110 @@ public class DialogueController : MonoBehaviour, IDialogueService
         }
 
         gameRoot.Progress.SetFlag(flagId, value);
+
+        if (gameRoot.Quest != null)
+        {
+            gameRoot.Quest.RefreshAllInProgressQuests();
+        }
+    }
+
+    /// <summary>
+    /// 선택지에 연결된 퀘스트를 수락합니다.
+    /// </summary>
+    /// <param name="choice">선택한 선택지 데이터입니다.</param>
+    private void AcceptQuest(DialogueChoiceData choice)
+    {
+        if (!TryGetQuestService(out IQuestService questService))
+        {
+            return;
+        }
+
+        if (choice.QuestData != null)
+        {
+            questService.TryAcceptQuest(choice.QuestData);
+            return;
+        }
+
+        questService.TryAcceptQuest(choice.ActionId);
+    }
+
+    /// <summary>
+    /// 선택지에 연결된 퀘스트 목표 상태를 갱신합니다.
+    /// </summary>
+    /// <param name="choice">선택한 선택지 데이터입니다.</param>
+    private void RefreshQuestProgress(DialogueChoiceData choice)
+    {
+        if (!TryGetQuestService(out IQuestService questService))
+        {
+            return;
+        }
+
+        if (choice.QuestData != null)
+        {
+            questService.RefreshQuestProgress(choice.QuestData);
+            return;
+        }
+
+        questService.RefreshQuestProgress(choice.ActionId);
+    }
+
+    /// <summary>
+    /// 선택지에 연결된 퀘스트를 완료 상태로 갱신합니다.
+    /// </summary>
+    /// <param name="choice">선택한 선택지 데이터입니다.</param>
+    private void CompleteQuest(DialogueChoiceData choice)
+    {
+        if (!TryGetQuestService(out IQuestService questService))
+        {
+            return;
+        }
+
+        if (choice.QuestData != null)
+        {
+            questService.TryCompleteQuest(choice.QuestData);
+            return;
+        }
+
+        questService.TryCompleteQuest(choice.ActionId);
+    }
+
+    /// <summary>
+    /// 선택지에 연결된 퀘스트 보상을 지급합니다.
+    /// </summary>
+    /// <param name="choice">선택한 선택지 데이터입니다.</param>
+    private void ClaimQuestReward(DialogueChoiceData choice)
+    {
+        if (!TryGetQuestService(out IQuestService questService))
+        {
+            return;
+        }
+
+        if (choice.QuestData != null)
+        {
+            questService.TryClaimReward(choice.QuestData);
+            return;
+        }
+
+        questService.TryClaimReward(choice.ActionId);
+    }
+
+    /// <summary>
+    /// GameRoot에서 퀘스트 서비스를 조회합니다.
+    /// </summary>
+    /// <param name="questService">조회된 퀘스트 서비스입니다.</param>
+    /// <returns>서비스를 찾으면 true입니다.</returns>
+    private bool TryGetQuestService(out IQuestService questService)
+    {
+        questService = null;
+
+        if (!GameRoot.TryGetInstance(out GameRoot gameRoot) || gameRoot.Quest == null)
+        {
+            Debug.LogWarning("[DialogueController] QuestController를 찾을 수 없어 Quest 액션을 실행하지 못했습니다.");
+            return false;
+        }
+
+        questService = gameRoot.Quest;
+        return true;
     }
 
     /// <summary>

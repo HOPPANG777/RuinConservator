@@ -242,6 +242,12 @@ public class SceneStateBridge : MonoBehaviour
         if (player != null)
         {
             player.transform.SetPositionAndRotation(spawnPoint.Position, spawnPoint.Rotation);
+
+            if (GameRoot.Instance != null && GameRoot.Instance.CameraController != null)
+            {
+                GameRoot.Instance.CameraController.Follow(player);
+            }
+
             return;
         }
 

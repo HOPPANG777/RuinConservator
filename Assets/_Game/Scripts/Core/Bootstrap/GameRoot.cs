@@ -50,6 +50,18 @@ public class GameRoot : Singleton<GameRoot>
 
     [Header("Controller")]
 
+    [Tooltip("퀘스트 상태 전환, 목표 갱신, 보상 지급을 관리하는 컨트롤러입니다.")]
+
+    [SerializeField] private QuestController _questController;
+
+    // 외부에는 구현체가 아닌 인터페이스(IQuestService) 계약만 노출합니다.
+
+    public IQuestService Quest { get => _questController; }
+
+
+
+    [Header("Controller")]
+
     [Tooltip("NPC 대화 그래프 진행과 대화 UI를 관리하는 컨트롤러입니다.")]
 
     [SerializeField] private DialogueController _dialogueController;
@@ -97,6 +109,18 @@ public class GameRoot : Singleton<GameRoot>
         {
 
             _progressController.Init();
+
+        }
+
+
+
+        // 퀘스트 컨트롤러를 초기화합니다.
+
+        if (_questController != null)
+
+        {
+
+            _questController.Init(_progressController);
 
         }
 
