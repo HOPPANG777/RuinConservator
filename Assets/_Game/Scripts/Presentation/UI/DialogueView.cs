@@ -69,7 +69,7 @@ public class DialogueView : MonoBehaviour
     public void ShowNode(DialogueActorSO actor, DialogueNodeData node, Action<int> onChoiceSelected)
     {
         SetVisible(true);
-        ApplyActor(actor);
+        ApplyActor(actor, node != null ? node.PortraitId : string.Empty);
 
         if (_bodyText != null)
         {
@@ -114,7 +114,7 @@ public class DialogueView : MonoBehaviour
     /// 화자 이름과 초상화를 출력합니다.
     /// </summary>
     /// <param name="actor">출력할 화자 데이터입니다.</param>
-    private void ApplyActor(DialogueActorSO actor)
+    private void ApplyActor(DialogueActorSO actor, string portraitId)
     {
         if (_speakerNameText != null)
         {
@@ -126,7 +126,7 @@ public class DialogueView : MonoBehaviour
             return;
         }
 
-        Sprite portrait = actor != null ? actor.Portrait : null;
+        Sprite portrait = actor != null ? actor.GetPortrait(portraitId) : null;
         _portraitImage.sprite = portrait;
 
         if (_hidePortraitWhenEmpty)

@@ -1,6 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.AttributeUsage(System.AttributeTargets.Field)]
+public sealed class DialoguePortraitIdAttribute : PropertyAttribute
+{
+}
+
 //==============================================================================
 // 기능: enum::DialogueChoiceActionType
 // 설명: 선택지 선택 시 즉시 실행할 간단한 대화 액션 종류
@@ -95,6 +100,12 @@ public class DialogueNodeData
     private DialogueActorSO _actorOverride;
 
     [Header("Node")]
+    [Tooltip("이 노드에서 사용할 초상화 ID입니다. 비워두면 화자의 기본 초상화를 사용합니다.")]
+    [DialoguePortraitId]
+    [SerializeField]
+    private string _portraitId;
+
+    [Header("Node")]
     [Tooltip("대화창에 출력할 본문입니다.")]
     [TextArea(3, 8)]
     [SerializeField]
@@ -119,6 +130,9 @@ public class DialogueNodeData
 
     /// <summary>이 노드에서만 사용할 화자입니다.</summary>
     public DialogueActorSO ActorOverride => _actorOverride;
+
+    /// <summary>이 노드에서 사용할 초상화 ID입니다.</summary>
+    public string PortraitId => _portraitId;
 
     /// <summary>대화창에 출력할 본문입니다.</summary>
     public string BodyText => _bodyText;
