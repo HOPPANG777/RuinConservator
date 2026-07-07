@@ -15,3 +15,7 @@ MonoBehaviour:
   _actorId: PLAYER
   _displayName: "\uC0BC\uAC01\uC774"
   _portrait: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  _portraits:
+  - _portraitId: normal
+    _displayName: "\uB178\uBA40 "
+    _portrait: {fileID: 21300000, guid: 3da0a419fdee1864b85f38c48560a58d, type: 3}

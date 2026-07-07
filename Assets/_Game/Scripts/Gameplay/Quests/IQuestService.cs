@@ -42,6 +42,7 @@ public interface IQuestService
 
     /// <summary>
     /// 퀘스트 목표 달성 여부를 확인하고 완료 상태로 갱신합니다.
+    /// 자동 소모 아이템이 필요한 퀘스트는 TryCompleteQuest()에서만 완료 확정합니다.
     /// </summary>
     /// <param name="questData">갱신할 퀘스트 데이터입니다.</param>
     /// <returns>이번 호출로 완료 상태가 되었으면 true입니다.</returns>
@@ -49,6 +50,7 @@ public interface IQuestService
 
     /// <summary>
     /// 퀘스트 목표 달성 여부를 확인하고 완료 상태로 갱신합니다.
+    /// 자동 소모 아이템이 필요한 퀘스트는 TryCompleteQuest()에서만 완료 확정합니다.
     /// </summary>
     /// <param name="questId">갱신할 퀘스트 ID입니다.</param>
     /// <returns>이번 호출로 완료 상태가 되었으면 true입니다.</returns>
@@ -61,14 +63,14 @@ public interface IQuestService
     int RefreshAllInProgressQuests();
 
     /// <summary>
-    /// 완료 가능한 퀘스트를 완료 상태로 변경합니다.
+    /// 완료 가능한 퀘스트를 완료 상태로 변경하고 필요한 아이템을 자동 소모합니다.
     /// </summary>
     /// <param name="questData">완료할 퀘스트 데이터입니다.</param>
     /// <returns>완료 상태가 되었거나 이미 완료 상태면 true입니다.</returns>
     bool TryCompleteQuest(QuestDataSO questData);
 
     /// <summary>
-    /// 완료 가능한 퀘스트를 완료 상태로 변경합니다.
+    /// 완료 가능한 퀘스트를 완료 상태로 변경하고 필요한 아이템을 자동 소모합니다.
     /// </summary>
     /// <param name="questId">완료할 퀘스트 ID입니다.</param>
     /// <returns>완료 상태가 되었거나 이미 완료 상태면 true입니다.</returns>

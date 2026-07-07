@@ -62,6 +62,26 @@ public class GameRoot : Singleton<GameRoot>
 
     [Header("Controller")]
 
+    [Tooltip("아이템 보관, 중첩, 소모, 카테고리 조회를 관리하는 컨트롤러입니다.")]
+
+    [SerializeField] private InventoryController _inventoryController;
+
+    // 외부에는 구현체가 아닌 인터페이스(IInventoryService) 계약만 노출합니다.
+
+    public IInventoryService Inventory => _inventoryController;
+
+
+
+    [Header("Controller")]
+
+    [Tooltip("인벤토리 UI 열기, 닫기, 카테고리 전환, 선택 입력을 중개하는 Presenter입니다.")]
+
+    [SerializeField] private InventoryPresenter _inventoryPresenter;
+
+
+
+    [Header("Controller")]
+
     [Tooltip("NPC 대화 그래프 진행과 대화 UI를 관리하는 컨트롤러입니다.")]
 
     [SerializeField] private DialogueController _dialogueController;
@@ -114,13 +134,37 @@ public class GameRoot : Singleton<GameRoot>
 
 
 
+        // 인벤토리 컨트롤러를 초기화합니다.
+
+        if (_inventoryController != null)
+
+        {
+
+            _inventoryController.Init();
+
+        }
+
+
+
+        // 인벤토리 UI Presenter를 초기화합니다.
+
+        if (_inventoryPresenter != null)
+
+        {
+
+            _inventoryPresenter.Init(_inventoryController);
+
+        }
+
+
+
         // 퀘스트 컨트롤러를 초기화합니다.
 
         if (_questController != null)
 
         {
 
-            _questController.Init(_progressController);
+            _questController.Init(_progressController, _inventoryController);
 
         }
 

@@ -30,6 +30,9 @@ public class QuestController : MonoBehaviour, IQuestService
     // 목표/보상 판정에 사용할 Progress 서비스입니다.
     private IProgressService _progressService;
 
+    // 아이템 보상 지급에 사용할 인벤토리 서비스입니다.
+    private IInventoryService _inventoryService;
+
     //==============================================================================
     // 초기화
     //==============================================================================
@@ -38,9 +41,11 @@ public class QuestController : MonoBehaviour, IQuestService
     /// GameRoot에서 호출하는 초기화 함수입니다.
     /// </summary>
     /// <param name="progressService">진행 상태 서비스입니다.</param>
-    public void Init(IProgressService progressService)
+    /// <param name="inventoryService">인벤토리 서비스입니다.</param>
+    public void Init(IProgressService progressService, IInventoryService inventoryService = null)
     {
         _progressService = progressService;
+        _inventoryService = inventoryService;
         RebuildQuestDatabase();
     }
 
@@ -144,6 +149,7 @@ public class QuestController : MonoBehaviour, IQuestService
 
     /// <summary>
     /// 퀘스트 목표 달성 여부를 확인하고 완료 상태로 갱신합니다.
+    /// 자동 소모 아이템이 필요한 퀘스트는 TryCompleteQuest()에서만 완료 확정합니다.
     /// </summary>
     /// <param name="questData">갱신할 퀘스트 데이터입니다.</param>
     /// <returns>이번 호출로 완료 상태가 되었으면 true입니다.</returns>
@@ -160,6 +166,11 @@ public class QuestController : MonoBehaviour, IQuestService
         }
 
         if (resolvedQuest.AreObjectivesSatisfied(_progressService) == false)
+        {
+            return false;
+        }
+
+        if (resolvedQuest.HasConsumeItems)
         {
             return false;
         }
@@ -213,7 +224,7 @@ public class QuestController : MonoBehaviour, IQuestService
     }
 
     /// <summary>
-    /// 완료 가능한 퀘스트를 완료 상태로 변경합니다.
+    /// 완료 가능한 퀘스트를 완료 상태로 변경하고 필요한 아이템을 자동 소모합니다.
     /// </summary>
     /// <param name="questData">완료할 퀘스트 데이터입니다.</param>
     /// <returns>완료 상태가 되었거나 이미 완료 상태면 true입니다.</returns>
@@ -241,12 +252,17 @@ public class QuestController : MonoBehaviour, IQuestService
             return false;
         }
 
+        if (resolvedQuest.TryConsumeRequiredItems(_inventoryService) == false)
+        {
+            return false;
+        }
+
         SetQuestState(resolvedQuest, QuestState.QUEST_COMPLETED);
         return true;
     }
 
     /// <summary>
-    /// 완료 가능한 퀘스트를 완료 상태로 변경합니다.
+    /// 완료 가능한 퀘스트를 완료 상태로 변경하고 필요한 아이템을 자동 소모합니다.
     /// </summary>
     /// <param name="questId">완료할 퀘스트 ID입니다.</param>
     /// <returns>완료 상태가 되었거나 이미 완료 상태면 true입니다.</returns>
@@ -281,7 +297,16 @@ public class QuestController : MonoBehaviour, IQuestService
 
         if (currentState == QuestState.QUEST_IN_PROGRESS)
         {
-            RefreshQuestProgress(resolvedQuest);
+            if (resolvedQuest.CanApplyRewards(_progressService, _inventoryService) == false)
+            {
+                return false;
+            }
+
+            if (TryCompleteQuest(resolvedQuest) == false)
+            {
+                return false;
+            }
+
             currentState = GetQuestState(resolvedQuest);
         }
 
@@ -290,7 +315,11 @@ public class QuestController : MonoBehaviour, IQuestService
             return false;
         }
 
-        resolvedQuest.ApplyRewards(_progressService);
+        if (resolvedQuest.TryApplyRewards(_progressService, _inventoryService) == false)
+        {
+            return false;
+        }
+
         SetQuestState(resolvedQuest, QuestState.QUEST_REWARDED);
 
         return true;
