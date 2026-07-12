@@ -19,10 +19,35 @@ public class DialogueView : MonoBehaviour
     [SerializeField]
     private CanvasGroup _rootCanvasGroup;
 
+    [Header("Background")]
+    [Tooltip("대화창 배경 이미지를 출력할 Image입니다.")]
+    [SerializeField]
+    private Image _dialogueBackgroundImage;
+
     [Header("Actor")]
-    [Tooltip("NPC 초상화를 출력할 Image입니다.")]
+    [Tooltip("기존 단일 초상화 Image입니다. Left Portrait Image가 비어 있으면 왼쪽 초상화로 사용합니다.")]
     [SerializeField]
     private Image _portraitImage;
+
+    [Header("Actor")]
+    [Tooltip("왼쪽 화자 초상화를 출력할 Image입니다.")]
+    [SerializeField]
+    private Image _leftPortraitImage;
+
+    [Header("Actor")]
+    [Tooltip("오른쪽 화자 초상화를 출력할 Image입니다.")]
+    [SerializeField]
+    private Image _rightPortraitImage;
+
+    [Header("Actor")]
+    [Tooltip("현재 말하는 화자 초상화에 적용할 색상입니다.")]
+    [SerializeField]
+    private Color _activePortraitColor = Color.white;
+
+    [Header("Actor")]
+    [Tooltip("현재 말하지 않는 화자 초상화에 적용할 색상입니다.")]
+    [SerializeField]
+    private Color _inactivePortraitColor = new Color(0.35f, 0.35f, 0.35f, 1.0f);
 
     [Header("Actor")]
     [Tooltip("초상화가 없을 때 Image를 숨길지 여부입니다.")]
@@ -56,6 +81,30 @@ public class DialogueView : MonoBehaviour
     // 재사용할 선택지 버튼 목록입니다.
     private readonly List<Button> _choiceButtons = new List<Button>();
 
+    // UI에 기본으로 지정된 대화창 배경 이미지입니다.
+    private Sprite _defaultDialogueBackgroundSprite;
+
+    // 기본 배경 이미지를 한 번만 저장하기 위한 플래그입니다.
+    private bool _hasCachedDialogueBackground;
+
+    // 왼쪽 초상화 Image입니다. 신규 필드가 비어 있으면 기존 단일 초상화를 재사용합니다.
+    private Image LeftPortraitImage => _leftPortraitImage != null ? _leftPortraitImage : _portraitImage;
+
+    // 오른쪽 초상화 Image입니다.
+    private Image RightPortraitImage => _rightPortraitImage;
+
+    //==============================================================================
+    // 초기화
+    //==============================================================================
+
+    /// <summary>
+    /// UI에 지정된 기본 배경 이미지를 저장합니다.
+    /// </summary>
+    private void Awake()
+    {
+        CacheDefaultDialogueBackground();
+    }
+
     //==============================================================================
     // 공개 API
     //==============================================================================
@@ -68,8 +117,29 @@ public class DialogueView : MonoBehaviour
     /// <param name="onChoiceSelected">선택지 선택 콜백입니다.</param>
     public void ShowNode(DialogueActorSO actor, DialogueNodeData node, Action<int> onChoiceSelected)
     {
+        ShowNode(actor, node, onChoiceSelected, actor, null, null);
+    }
+
+    /// <summary>
+    /// 노드 내용과 좌우 화자 초상화, 대화창 배경을 대화 UI에 출력합니다.
+    /// </summary>
+    /// <param name="actor">현재 말하는 화자 데이터입니다.</param>
+    /// <param name="node">출력할 대화 노드입니다.</param>
+    /// <param name="onChoiceSelected">선택지 선택 콜백입니다.</param>
+    /// <param name="leftActor">왼쪽에 표시할 화자입니다.</param>
+    /// <param name="rightActor">오른쪽에 표시할 화자입니다.</param>
+    /// <param name="dialogueBackground">이번 노드에 표시할 대화창 배경 이미지입니다.</param>
+    public void ShowNode(
+        DialogueActorSO actor,
+        DialogueNodeData node,
+        Action<int> onChoiceSelected,
+        DialogueActorSO leftActor,
+        DialogueActorSO rightActor,
+        Sprite dialogueBackground)
+    {
         SetVisible(true);
-        ApplyActor(actor, node != null ? node.PortraitId : string.Empty);
+        ApplyDialogueBackground(dialogueBackground);
+        ApplyActor(actor, node != null ? node.PortraitId : string.Empty, leftActor, rightActor);
 
         if (_bodyText != null)
         {
@@ -111,27 +181,94 @@ public class DialogueView : MonoBehaviour
     }
 
     /// <summary>
-    /// 화자 이름과 초상화를 출력합니다.
+    /// 대화창 배경 이미지를 출력합니다.
     /// </summary>
-    /// <param name="actor">출력할 화자 데이터입니다.</param>
-    private void ApplyActor(DialogueActorSO actor, string portraitId)
+    /// <param name="dialogueBackground">출력할 배경 이미지입니다.</param>
+    private void ApplyDialogueBackground(Sprite dialogueBackground)
+    {
+        if (_dialogueBackgroundImage == null)
+        {
+            return;
+        }
+
+        CacheDefaultDialogueBackground();
+        _dialogueBackgroundImage.sprite = dialogueBackground != null
+            ? dialogueBackground
+            : _defaultDialogueBackgroundSprite;
+        _dialogueBackgroundImage.enabled = _dialogueBackgroundImage.sprite != null
+            || _dialogueBackgroundImage.color.a > 0.0f;
+    }
+
+    /// <summary>
+    /// UI에 지정된 기본 대화창 배경 이미지를 저장합니다.
+    /// </summary>
+    private void CacheDefaultDialogueBackground()
+    {
+        if (_hasCachedDialogueBackground || _dialogueBackgroundImage == null)
+        {
+            return;
+        }
+
+        _defaultDialogueBackgroundSprite = _dialogueBackgroundImage.sprite;
+        _hasCachedDialogueBackground = true;
+    }
+
+    /// <summary>
+    /// 화자 이름과 좌우 초상화를 출력합니다.
+    /// </summary>
+    /// <param name="actor">현재 말하는 화자 데이터입니다.</param>
+    /// <param name="portraitId">현재 말하는 화자에게 적용할 초상화 ID입니다.</param>
+    /// <param name="leftActor">왼쪽에 표시할 화자입니다.</param>
+    /// <param name="rightActor">오른쪽에 표시할 화자입니다.</param>
+    private void ApplyActor(
+        DialogueActorSO actor,
+        string portraitId,
+        DialogueActorSO leftActor,
+        DialogueActorSO rightActor)
     {
         if (_speakerNameText != null)
         {
             _speakerNameText.text = actor != null ? actor.DisplayName : string.Empty;
         }
 
-        if (_portraitImage == null)
+        if (leftActor == null && rightActor == null)
+        {
+            leftActor = actor;
+        }
+
+        ApplyPortrait(LeftPortraitImage, leftActor, actor, portraitId);
+        ApplyPortrait(RightPortraitImage, rightActor, actor, portraitId);
+    }
+
+    /// <summary>
+    /// 초상화 Image 하나를 갱신합니다.
+    /// </summary>
+    /// <param name="portraitImage">출력 대상 Image입니다.</param>
+    /// <param name="portraitActor">이 위치에 표시할 화자입니다.</param>
+    /// <param name="speakingActor">현재 말하는 화자입니다.</param>
+    /// <param name="speakingPortraitId">현재 말하는 화자에게 적용할 초상화 ID입니다.</param>
+    private void ApplyPortrait(
+        Image portraitImage,
+        DialogueActorSO portraitActor,
+        DialogueActorSO speakingActor,
+        string speakingPortraitId)
+    {
+        if (portraitImage == null)
         {
             return;
         }
 
-        Sprite portrait = actor != null ? actor.GetPortrait(portraitId) : null;
-        _portraitImage.sprite = portrait;
+        bool isSpeaking = portraitActor != null && portraitActor == speakingActor;
+        Sprite portrait = portraitActor != null
+            ? portraitActor.GetPortrait(isSpeaking ? speakingPortraitId : string.Empty)
+            : null;
+
+        portraitImage.sprite = portrait;
+        portraitImage.color = isSpeaking ? _activePortraitColor : _inactivePortraitColor;
 
         if (_hidePortraitWhenEmpty)
         {
-            _portraitImage.enabled = portrait != null;
+            portraitImage.enabled = portrait != null;
         }
     }
 

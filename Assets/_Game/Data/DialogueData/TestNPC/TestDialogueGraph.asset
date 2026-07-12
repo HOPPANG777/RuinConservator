@@ -15,16 +15,21 @@ MonoBehaviour:
   _graphId: TESTGRAPH
   _defaultActor: {fileID: 11400000, guid: fb1303c0a9b1d34498f455456a56d9da, type: 2}
   _startNodeId: start
+  _leftActor: {fileID: 11400000, guid: f6fdd22067103264ca00ad85496974c8, type: 2}
+  _rightActor: {fileID: 11400000, guid: fb1303c0a9b1d34498f455456a56d9da, type: 2}
+  _dialogueBackground: {fileID: 0}
   _nodes:
   - _nodeId: startTestNode
     _actorOverride: {fileID: 11400000, guid: f6fdd22067103264ca00ad85496974c8, type: 2}
     _portraitId: normal
+    _dialogueBackgroundOverride: {fileID: 0}
     _bodyText: "\uB2CC \uB204\uACE0?"
     _nextNodeId: secondTestNode
     _choices: []
   - _nodeId: secondTestNode
     _actorOverride: {fileID: 11400000, guid: fb1303c0a9b1d34498f455456a56d9da, type: 2}
     _portraitId: fear
+    _dialogueBackgroundOverride: {fileID: 0}
     _bodyText: "\uB09C TestNPC\uB2E4"
     _nextNodeId: 
     _choices:

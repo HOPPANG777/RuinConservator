@@ -266,7 +266,11 @@ public class DialogueController : MonoBehaviour, IDialogueService
         }
 
         DialogueActorSO actor = ResolveActor(_currentNode);
-        _dialogueView.ShowNode(actor, _currentNode, SelectChoice);
+        DialogueActorSO leftActor = ResolveLeftActor(actor);
+        DialogueActorSO rightActor = ResolveRightActor(actor, leftActor);
+        Sprite dialogueBackground = ResolveDialogueBackground(_currentNode);
+
+        _dialogueView.ShowNode(actor, _currentNode, SelectChoice, leftActor, rightActor, dialogueBackground);
     }
 
     /// <summary>
@@ -300,6 +304,11 @@ public class DialogueController : MonoBehaviour, IDialogueService
     /// <returns>출력할 화자 데이터입니다.</returns>
     private DialogueActorSO ResolveActor(DialogueNodeData node)
     {
+        return ResolveActorForNode(node);
+    }
+
+    private DialogueActorSO ResolveActorForNode(DialogueNodeData node)
+    {
         if (node != null && node.ActorOverride != null)
         {
             return node.ActorOverride;
@@ -313,6 +322,73 @@ public class DialogueController : MonoBehaviour, IDialogueService
         if (_currentGraph != null)
         {
             return _currentGraph.DefaultActor;
+        }
+
+        return null;
+    }
+
+    private DialogueActorSO ResolveLeftActor(DialogueActorSO currentActor)
+    {
+        if (_currentGraph != null && _currentGraph.LeftActor != null)
+        {
+            return _currentGraph.LeftActor;
+        }
+
+        return currentActor;
+    }
+
+    private DialogueActorSO ResolveRightActor(DialogueActorSO currentActor, DialogueActorSO leftActor)
+    {
+        if (_currentGraph != null && _currentGraph.RightActor != null)
+        {
+            return _currentGraph.RightActor;
+        }
+
+        DialogueActorSO discoveredActor = FindDifferentGraphActor(leftActor);
+        if (discoveredActor != null)
+        {
+            return discoveredActor;
+        }
+
+        if (currentActor != null && currentActor != leftActor)
+        {
+            return currentActor;
+        }
+
+        return null;
+    }
+
+    private DialogueActorSO FindDifferentGraphActor(DialogueActorSO excludedActor)
+    {
+        if (_currentGraph == null || _currentGraph.Nodes == null)
+        {
+            return null;
+        }
+
+        for (int i = 0; i < _currentGraph.Nodes.Count; i++)
+        {
+            DialogueNodeData node = _currentGraph.Nodes[i];
+            DialogueActorSO actor = ResolveActorForNode(node);
+
+            if (actor != null && actor != excludedActor)
+            {
+                return actor;
+            }
+        }
+
+        return null;
+    }
+
+    private Sprite ResolveDialogueBackground(DialogueNodeData node)
+    {
+        if (node != null && node.DialogueBackgroundOverride != null)
+        {
+            return node.DialogueBackgroundOverride;
+        }
+
+        if (_currentGraph != null)
+        {
+            return _currentGraph.DialogueBackground;
         }
 
         return null;

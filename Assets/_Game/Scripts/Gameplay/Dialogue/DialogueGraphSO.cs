@@ -106,6 +106,11 @@ public class DialogueNodeData
     private string _portraitId;
 
     [Header("Node")]
+    [Tooltip("이 노드에서만 사용할 대화창 배경 이미지입니다. 비워두면 그래프 또는 UI 기본 배경을 사용합니다.")]
+    [SerializeField]
+    private Sprite _dialogueBackgroundOverride;
+
+    [Header("Node")]
     [Tooltip("대화창에 출력할 본문입니다.")]
     [TextArea(3, 8)]
     [SerializeField]
@@ -133,6 +138,9 @@ public class DialogueNodeData
 
     /// <summary>이 노드에서 사용할 초상화 ID입니다.</summary>
     public string PortraitId => _portraitId;
+
+    /// <summary>이 노드에서만 사용할 대화창 배경 이미지입니다.</summary>
+    public Sprite DialogueBackgroundOverride => _dialogueBackgroundOverride;
 
     /// <summary>대화창에 출력할 본문입니다.</summary>
     public string BodyText => _bodyText;
@@ -173,6 +181,21 @@ public class DialogueGraphSO : ScriptableObject
     [SerializeField]
     private string _startNodeId = "start";
 
+    [Header("Participants")]
+    [Tooltip("대화 UI 왼쪽에 표시할 화자입니다. 비워두면 현재 대화에서 자동으로 추론합니다.")]
+    [SerializeField]
+    private DialogueActorSO _leftActor;
+
+    [Header("Participants")]
+    [Tooltip("대화 UI 오른쪽에 표시할 화자입니다. 비워두면 현재 대화에서 자동으로 추론합니다.")]
+    [SerializeField]
+    private DialogueActorSO _rightActor;
+
+    [Header("Dialogue UI")]
+    [Tooltip("이 그래프에서 사용할 대화창 배경 이미지입니다. 노드 배경 오버라이드가 있으면 그 값이 우선됩니다.")]
+    [SerializeField]
+    private Sprite _dialogueBackground;
+
     [Header("Nodes")]
     [Tooltip("대화 그래프에 포함된 노드 목록입니다.")]
     [SerializeField]
@@ -190,6 +213,15 @@ public class DialogueGraphSO : ScriptableObject
 
     /// <summary>대화를 시작할 노드 ID입니다.</summary>
     public string StartNodeId => _startNodeId;
+
+    /// <summary>대화 UI 왼쪽에 표시할 화자입니다.</summary>
+    public DialogueActorSO LeftActor => _leftActor;
+
+    /// <summary>대화 UI 오른쪽에 표시할 화자입니다.</summary>
+    public DialogueActorSO RightActor => _rightActor;
+
+    /// <summary>이 그래프에서 사용할 대화창 배경 이미지입니다.</summary>
+    public Sprite DialogueBackground => _dialogueBackground;
 
     /// <summary>대화 그래프에 포함된 노드 목록입니다.</summary>
     public IReadOnlyList<DialogueNodeData> Nodes => _nodes;
