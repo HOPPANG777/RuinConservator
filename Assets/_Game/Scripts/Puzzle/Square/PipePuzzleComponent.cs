@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class PipeComponent : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class PipePuzzleComponent : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public PipeData Data { get; private set; }
+    public PipePuzzleData Data { get; private set; }
     public int Row { get; set; }
     public int Col { get; set; }
     public bool IsWatered { get; set; } = false;
@@ -19,7 +19,7 @@ public class PipeComponent : MonoBehaviour, IPointerClickHandler, IBeginDragHand
         rectTransform = GetComponent<RectTransform>();
     }
 
-    public void Setup(PipeData tileData, int r, int c, PipePuzzleManager spawner)
+    public void Setup(PipePuzzleData tileData, int r, int c, PipePuzzleManager spawner)
     {
         Data = tileData;
         Row = r;
@@ -40,10 +40,10 @@ public class PipeComponent : MonoBehaviour, IPointerClickHandler, IBeginDragHand
 
     public void Rotate()
     {
-        if (Data.type == PipeType.Empty || Data.type == PipeType.Start || Data.type == PipeType.End)
+        if (Data.type == PipePuzzleType.Empty || Data.type == PipePuzzleType.Start || Data.type == PipePuzzleType.End)
             return;
 
-        PipeData updatedData = Data;
+        PipePuzzleData updatedData = Data;
         updatedData.rotationIndex = (updatedData.rotationIndex + 1) % 4;
         Data = updatedData;
 
@@ -79,10 +79,10 @@ public class PipeComponent : MonoBehaviour, IPointerClickHandler, IBeginDragHand
     {
         if (tileImage == null) return;
 
-        if (!IsWatered && Data.type != PipeType.End)
+        if (!IsWatered && Data.type != PipePuzzleType.End)
             tileImage.color = Color.white;
         else
-            tileImage.color = Data.type == PipeType.Start ? Color.green : Color.cyan;
+            tileImage.color = Data.type == PipePuzzleType.Start ? Color.green : Color.cyan;
     }
 
     private void UpdateVisualRotation()
@@ -90,12 +90,6 @@ public class PipeComponent : MonoBehaviour, IPointerClickHandler, IBeginDragHand
         if (rectTransform == null)
         {
             rectTransform = GetComponent<RectTransform>();
-        }
-
-        if (rectTransform == null)
-        {
-            Debug.LogError($"[{gameObject.name}] RectTransform 컴포넌트를 찾을 수 없습니다!");
-            return;
         }
 
         rectTransform.localRotation = Quaternion.Euler(0, 0, -Data.rotationIndex * 90f);

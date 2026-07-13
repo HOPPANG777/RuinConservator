@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class PipeParser
+public static class PipePuzzleParser
 {
-    public static PipeStageParsedData Parse(string textData)
+    public static PipePuzzleStageData Parse(string textData)
     {
         if (string.IsNullOrEmpty(textData)) return null;
 
@@ -22,7 +22,7 @@ public static class PipeParser
 
             if (validLines.Count < 2) return null;
 
-            PipeStageParsedData stageData = new PipeStageParsedData();
+            PipePuzzleStageData stageData = new PipePuzzleStageData();
 
             string[] sizeTokens = validLines[0].Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
             stageData.rows = int.Parse(sizeTokens[0]);
@@ -36,7 +36,7 @@ public static class PipeParser
                 {
                     if (j + 1 >= tokens.Length) break;
 
-                    stageData.tileDataList.Add(new PipeTileRawData
+                    stageData.tileDataList.Add(new PipePuzzleTileData
                     {
                         typeStr = tokens[j],
                         rotationIndex = int.Parse(tokens[j + 1])

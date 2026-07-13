@@ -19,7 +19,7 @@ public class CirclePuzzleManager : BasePuzzleManager
     [SerializeField] private float startScale = 1.0f;
     [SerializeField] private float scaleStep = 0.4f;
 
-    private List<UiCircleComponent> spawnedRings = new List<UiCircleComponent>();
+    private List<CirclePuzzleComponent> spawnedRings = new List<CirclePuzzleComponent>();
 
     public override void InitPuzzle()
     {
@@ -67,9 +67,9 @@ public class CirclePuzzleManager : BasePuzzleManager
                 ringRect.localScale = new Vector3(currentScale, currentScale, 1f);
             }
 
-            UiCircleComponent ringComp = ringObj.GetComponent<UiCircleComponent>() ?? ringObj.AddComponent<UiCircleComponent>();
+            CirclePuzzleComponent ringComp = ringObj.GetComponent<CirclePuzzleComponent>() ?? ringObj.AddComponent<CirclePuzzleComponent>();
 
-            ringComp.InitRingState(data.segments, patternPrefab, this);
+            ringComp.InitCircleState(data.segments, patternPrefab, this);
 
             ringObj.transform.SetAsFirstSibling();
 

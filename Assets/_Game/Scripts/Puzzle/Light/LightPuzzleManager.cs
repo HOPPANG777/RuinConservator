@@ -13,8 +13,8 @@ public class LightPuzzleManager : BasePuzzleManager
     [Header("Text File Path Settings")]
     [SerializeField] private string stageFileName = "Stage01";
 
-    private Dictionary<int, UiLightTileComponent> spawnedTiles = new Dictionary<int, UiLightTileComponent>();
-    private LightStageParsedData currentRuntimeData;
+    private Dictionary<int, LightPuzzleComponent> spawnedTiles = new Dictionary<int, LightPuzzleComponent>();
+    private LightPuzzleStageData currentRuntimeData;
 
     public override void InitPuzzle()
     {
@@ -52,7 +52,7 @@ public class LightPuzzleManager : BasePuzzleManager
             {
                 if (dataIndex >= currentRuntimeData.tileDataList.Count) break;
 
-                LightTileRawData tileData = currentRuntimeData.tileDataList[dataIndex];
+                LightPuzzleData tileData = currentRuntimeData.tileDataList[dataIndex];
 
                 if (tilePrefab != null && gridParent != null)
                 {
@@ -62,7 +62,7 @@ public class LightPuzzleManager : BasePuzzleManager
                     RectTransform tileRect = tileObj.GetComponent<RectTransform>();
                     tileRect.localPosition = startLocalPos + new Vector3(c * itemSpacing, -r * itemSpacing, 0);
 
-                    UiLightTileComponent lightTile = tileObj.GetComponent<UiLightTileComponent>() ?? tileObj.AddComponent<UiLightTileComponent>();
+                    LightPuzzleComponent lightTile = tileObj.GetComponent<LightPuzzleComponent>() ?? tileObj.AddComponent<LightPuzzleComponent>();
                     lightTile.Init(tileData.id, tileData.initialState == 1, this);
 
                     spawnedTiles.Add(tileData.id, lightTile);
@@ -76,12 +76,12 @@ public class LightPuzzleManager : BasePuzzleManager
     {
         if (currentRuntimeData == null || IsClear) return;
 
-        LightTileRawData clickedData = currentRuntimeData.tileDataList.Find(x => x.id == clickedId);
+        LightPuzzleData clickedData = currentRuntimeData.tileDataList.Find(x => x.id == clickedId);
         if (clickedData == null) return;
 
         foreach (int targetId in clickedData.targetIds)
         {
-            if (spawnedTiles.TryGetValue(targetId, out UiLightTileComponent targetTile))
+            if (spawnedTiles.TryGetValue(targetId, out LightPuzzleComponent targetTile))
             {
                 targetTile.ToggleState();
             }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class LightPuzzleParser
 {
-    public static LightStageParsedData Parse(string textData)
+    public static LightPuzzleStageData Parse(string textData)
     {
         if (string.IsNullOrEmpty(textData))
         {
@@ -30,7 +30,7 @@ public static class LightPuzzleParser
                 return null;
             }
 
-            LightStageParsedData stageData = new LightStageParsedData();
+            LightPuzzleStageData stageData = new LightPuzzleStageData();
 
             string[] sizeTokens = validLines[0].Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
             stageData.rows = int.Parse(sizeTokens[0]);
@@ -41,7 +41,7 @@ public static class LightPuzzleParser
                 string[] tokens = validLines[i].Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
                 if (tokens.Length < 3) continue;
 
-                LightTileRawData tileData = new LightTileRawData
+                LightPuzzleData tileData = new LightPuzzleData
                 {
                     id = int.Parse(tokens[0]),
                     initialState = int.Parse(tokens[1])

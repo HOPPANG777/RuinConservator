@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 [Serializable]
-public class LightTileRawData
+public class LightPuzzleData
 {
     public int id;
     public int initialState; 
@@ -10,10 +10,10 @@ public class LightTileRawData
 }
 
 [Serializable]
-public class LightStageParsedData
+public class LightPuzzleStageData
 {
     public int rows;
     public int cols;
-    public List<LightTileRawData> tileDataList = new List<LightTileRawData>();
+    public List<LightPuzzleData> tileDataList = new List<LightPuzzleData>();
 }
 

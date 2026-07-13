@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class UiLightTileComponent : MonoBehaviour, IPointerClickHandler
+public class LightPuzzleComponent : MonoBehaviour, IPointerClickHandler
 {
     public int Id { get; private set; }
     public bool IsOn { get; private set; }

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class UiCircleComponent : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class CirclePuzzleComponent : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Header("Ring Settings")]
     public int segments = 8;
@@ -24,7 +24,7 @@ public class UiCircleComponent : MonoBehaviour, IBeginDragHandler, IDragHandler,
         rectTransform = GetComponent<RectTransform>();
     }
 
-    public void InitRingState(int totalSegments, GameObject patternPrefab, CirclePuzzleManager manager)
+    public void InitCircleState(int totalSegments, GameObject patternPrefab, CirclePuzzleManager manager)
     {
         segments = totalSegments;
         ownerManager = manager;

@@ -24,11 +24,11 @@ public class PipePuzzleManager : BasePuzzleManager
 
     private int rows;
     private int cols;
-    private PipeComponent[,] grid;
+    private PipePuzzleComponent[,] grid;
 
     // 드래그 조작 내부 UI 변수들
-    private PipeComponent selectedTile;
-    private PipeComponent targetEmptyTile;
+    private PipePuzzleComponent selectedTile;
+    private PipePuzzleComponent targetEmptyTile;
     private Vector3 originalLocalPos;
     private Vector3 emptyTileLocalPos;
     private bool isDragging = false;
@@ -59,12 +59,12 @@ public class PipePuzzleManager : BasePuzzleManager
         }
 
         string rawStageText = File.ReadAllText(fullPath);
-        PipeStageParsedData parsedData = PipeParser.Parse(rawStageText);
+        PipePuzzleStageData parsedData = PipePuzzleParser.Parse(rawStageText);
         if (parsedData == null) return;
 
         rows = parsedData.rows;
         cols = parsedData.cols;
-        grid = new PipeComponent[rows, cols];
+        grid = new PipePuzzleComponent[rows, cols];
 
         Vector3 startLocalPos = new Vector3(-(cols - 1) * itemSpacing / 2f, (rows - 1) * itemSpacing / 2f, 0);
 
@@ -75,20 +75,20 @@ public class PipePuzzleManager : BasePuzzleManager
             {
                 if (dataIndex >= parsedData.tileDataList.Count) break;
 
-                PipeTileRawData rawData = parsedData.tileDataList[dataIndex];
+                PipePuzzleTileData rawData = parsedData.tileDataList[dataIndex];
 
-                PipeData tileData = new PipeData();
+                PipePuzzleData tileData = new PipePuzzleData();
                 tileData.rotationIndex = rawData.rotationIndex;
                 tileData.type = rawData.typeStr switch
                 {
-                    "0" => PipeType.Empty,
-                    "S" => PipeType.Start,
-                    "E" => PipeType.End,
-                    "1S" => PipeType.Pipe_1_Straight,
-                    "1C" => PipeType.Pipe_1_Corner,
-                    "2" => PipeType.Pipe_2_T,
-                    "3" => PipeType.Pipe_3_Cross,
-                    _ => PipeType.Empty
+                    "0" => PipePuzzleType.Empty,
+                    "S" => PipePuzzleType.Start,
+                    "E" => PipePuzzleType.End,
+                    "1S" => PipePuzzleType.Pipe_1_Straight,
+                    "1C" => PipePuzzleType.Pipe_1_Corner,
+                    "2" => PipePuzzleType.Pipe_2_T,
+                    "3" => PipePuzzleType.Pipe_3_Cross,
+                    _ => PipePuzzleType.Empty
                 };
 
                 GameObject prefab = GetTilePrefab(tileData.type);
@@ -101,7 +101,7 @@ public class PipePuzzleManager : BasePuzzleManager
                     Vector3 spawnLocalPos = startLocalPos + new Vector3(c * itemSpacing, -r * itemSpacing, 0);
                     tileRect.localPosition = spawnLocalPos;
 
-                    PipeComponent tileComp = spawnedObj.GetComponent<PipeComponent>() ?? spawnedObj.AddComponent<PipeComponent>();
+                    PipePuzzleComponent tileComp = spawnedObj.GetComponent<PipePuzzleComponent>() ?? spawnedObj.AddComponent<PipePuzzleComponent>();
                     tileComp.Setup(tileData, r, c, this);
                     grid[r, c] = tileComp;
                 }
@@ -114,9 +114,9 @@ public class PipePuzzleManager : BasePuzzleManager
         UpdateWaterFlow();
     }
 
-    public void OnTileBeginDrag(PipeComponent tile, Vector2 screenPos)
+    public void OnTileBeginDrag(PipePuzzleComponent tile, Vector2 screenPos)
     {
-        if (tile.Data.type == PipeType.Empty || tile.Data.type == PipeType.Start || tile.Data.type == PipeType.End) return;
+        if (tile.Data.type == PipePuzzleType.Empty || tile.Data.type == PipePuzzleType.Start || tile.Data.type == PipePuzzleType.End) return;
 
         selectedTile = tile;
         originalLocalPos = tile.GetComponent<RectTransform>().localPosition;
@@ -143,8 +143,8 @@ public class PipePuzzleManager : BasePuzzleManager
                 else
                     checkRow += (mouseDelta.y > 0) ? -1 : 1;
 
-                PipeComponent neighbor = GetSpecificTile(checkRow, checkCol);
-                if (neighbor != null && neighbor.Data.type == PipeType.Empty)
+                PipePuzzleComponent neighbor = GetSpecificTile(checkRow, checkCol);
+                if (neighbor != null && neighbor.Data.type == PipePuzzleType.Empty)
                 {
                     targetEmptyTile = neighbor;
                     emptyTileLocalPos = targetEmptyTile.GetComponent<RectTransform>().localPosition;
@@ -213,7 +213,7 @@ public class PipePuzzleManager : BasePuzzleManager
         UpdateWaterFlow();
     }
 
-    public void ExecuteGridSwap(PipeComponent draggedTile, PipeComponent emptyTile)
+    public void ExecuteGridSwap(PipePuzzleComponent draggedTile, PipePuzzleComponent emptyTile)
     {
         int dRow = draggedTile.Row, dCol = draggedTile.Col;
         int eRow = emptyTile.Row, eCol = emptyTile.Col;
@@ -234,18 +234,18 @@ public class PipePuzzleManager : BasePuzzleManager
     {
         if (grid == null) return;
 
-        PipeComponent startTile = null;
+        PipePuzzleComponent startTile = null;
         foreach (var tile in grid)
         {
             if (tile == null) continue;
             tile.IsWatered = false;
-            if (tile.Data.type == PipeType.Start) startTile = tile;
+            if (tile.Data.type == PipePuzzleType.Start) startTile = tile;
         }
 
         if (startTile == null) return;
 
-        Queue<PipeComponent> queue = new Queue<PipeComponent>();
-        HashSet<PipeComponent> visited = new HashSet<PipeComponent>();
+        Queue<PipePuzzleComponent> queue = new Queue<PipePuzzleComponent>();
+        HashSet<PipePuzzleComponent> visited = new HashSet<PipePuzzleComponent>();
 
         queue.Enqueue(startTile);
         visited.Add(startTile);
@@ -256,10 +256,10 @@ public class PipePuzzleManager : BasePuzzleManager
 
         while (queue.Count > 0)
         {
-            PipeComponent current = queue.Dequeue();
+            PipePuzzleComponent current = queue.Dequeue();
             current.IsWatered = true;
 
-            if (current.Data.type == PipeType.End) stageClearDetected = true;
+            if (current.Data.type == PipePuzzleType.End) stageClearDetected = true;
 
             for (int i = 0; i < 4; i++)
             {
@@ -268,7 +268,7 @@ public class PipePuzzleManager : BasePuzzleManager
 
                 if (nRow >= 0 && nRow < rows && nCol >= 0 && nCol < cols)
                 {
-                    PipeComponent nextTile = grid[nRow, nCol];
+                    PipePuzzleComponent nextTile = grid[nRow, nCol];
                     if (nextTile != null && !visited.Contains(nextTile) && IsConnected(current, nextTile))
                     {
                         visited.Add(nextTile);
@@ -297,7 +297,7 @@ public class PipePuzzleManager : BasePuzzleManager
         TriggerClearEvent();
     }
 
-    public PipeComponent GetSpecificTile(int row, int col)
+    public PipePuzzleComponent GetSpecificTile(int row, int col)
     {
         if (row >= 0 && row < rows && col >= 0 && col < cols) return grid[row, col];
         return null;
@@ -309,35 +309,35 @@ public class PipePuzzleManager : BasePuzzleManager
         return startLocalPos + new Vector3(c * itemSpacing, -r * itemSpacing, 0);
     }
 
-    private GameObject GetTilePrefab(PipeType type) => type switch
+    private GameObject GetTilePrefab(PipePuzzleType type) => type switch
     {
-        PipeType.Empty => emptyTilePrefab,
-        PipeType.Start => startTilePrefab,
-        PipeType.End => endTilePrefab,
-        PipeType.Pipe_1_Straight => pipeStraightPrefab,
-        PipeType.Pipe_1_Corner => pipeCornerPrefab,
-        PipeType.Pipe_2_T => pipeTPrefab,
-        PipeType.Pipe_3_Cross => pipeCrossPrefab,
+        PipePuzzleType.Empty => emptyTilePrefab,
+        PipePuzzleType.Start => startTilePrefab,
+        PipePuzzleType.End => endTilePrefab,
+        PipePuzzleType.Pipe_1_Straight => pipeStraightPrefab,
+        PipePuzzleType.Pipe_1_Corner => pipeCornerPrefab,
+        PipePuzzleType.Pipe_2_T => pipeTPrefab,
+        PipePuzzleType.Pipe_3_Cross => pipeCrossPrefab,
         _ => null
     };
 
-    private bool IsConnected(PipeComponent from, PipeComponent to)
+    private bool IsConnected(PipePuzzleComponent from, PipePuzzleComponent to)
     {
         int rowDiff = to.Row - from.Row;
         int colDiff = to.Col - from.Col;
 
-        PipeDir fromDir = from.Data.GetCurrentDirections();
-        PipeDir toDir = to.Data.GetCurrentDirections();
+        PipePuzzleDir fromDir = from.Data.GetCurrentDirections();
+        PipePuzzleDir toDir = to.Data.GetCurrentDirections();
 
         if (rowDiff == 0)
         {
-            if (colDiff == 1) return (fromDir & PipeDir.Right) != 0 && (toDir & PipeDir.Left) != 0;
-            if (colDiff == -1) return (fromDir & PipeDir.Left) != 0 && (toDir & PipeDir.Right) != 0;
+            if (colDiff == 1) return (fromDir & PipePuzzleDir.Right) != 0 && (toDir & PipePuzzleDir.Left) != 0;
+            if (colDiff == -1) return (fromDir & PipePuzzleDir.Left) != 0 && (toDir & PipePuzzleDir.Right) != 0;
         }
         else if (colDiff == 0)
         {
-            if (rowDiff == 1) return (fromDir & PipeDir.Bottom) != 0 && (toDir & PipeDir.Top) != 0;
-            if (rowDiff == -1) return (fromDir & PipeDir.Top) != 0 && (toDir & PipeDir.Bottom) != 0;
+            if (rowDiff == 1) return (fromDir & PipePuzzleDir.Bottom) != 0 && (toDir & PipePuzzleDir.Top) != 0;
+            if (rowDiff == -1) return (fromDir & PipePuzzleDir.Top) != 0 && (toDir & PipePuzzleDir.Bottom) != 0;
         }
         return false;
     }
