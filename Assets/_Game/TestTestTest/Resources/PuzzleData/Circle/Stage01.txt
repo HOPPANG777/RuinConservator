@@ -1,0 +1,5 @@
+# Circle Puzzle Stage 01
+# RingName PrefabIndex Segments
+OuterRing   0   8
+MiddleRing  1   8
+InnerRing   2   8
