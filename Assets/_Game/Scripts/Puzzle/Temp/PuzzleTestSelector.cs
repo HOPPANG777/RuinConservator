@@ -43,13 +43,10 @@ public class PuzzleTestSelector : MonoBehaviour
     {
         if (Keyboard.current == null) return;
 
-        // 1번 키: 파이프 퍼즐 (배열의 0번째 항목)
         if (Keyboard.current.digit1Key.wasPressedThisFrame || Keyboard.current.numpad1Key.wasPressedThisFrame) SelectPuzzle(0);
 
-        // 2번 키: 라이트 퍼즐 (배열의 1번째 항목)
         if (Keyboard.current.digit2Key.wasPressedThisFrame || Keyboard.current.numpad2Key.wasPressedThisFrame) SelectPuzzle(1);
 
-        // --- [핵심 추가] 3번 키: 서클(원) 퍼즐 (배열의 2번째 항목) ---
         if (Keyboard.current.digit3Key.wasPressedThisFrame || Keyboard.current.numpad3Key.wasPressedThisFrame) SelectPuzzle(2);
 
         if (Keyboard.current.rKey.wasPressedThisFrame)
