@@ -11,7 +11,7 @@ public class UiCircleComponent : MonoBehaviour, IBeginDragHandler, IDragHandler,
     public float AnglePerSegment => 360f / segments;
 
     private RectTransform rectTransform;
-    private UiCirclePuzzleManager ownerManager;
+    private CirclePuzzleManager ownerManager;
 
     private float startMouseAngle;
     private float startRingAngle;
@@ -24,7 +24,7 @@ public class UiCircleComponent : MonoBehaviour, IBeginDragHandler, IDragHandler,
         rectTransform = GetComponent<RectTransform>();
     }
 
-    public void InitRingState(int totalSegments, GameObject patternPrefab, UiCirclePuzzleManager manager)
+    public void InitRingState(int totalSegments, GameObject patternPrefab, CirclePuzzleManager manager)
     {
         segments = totalSegments;
         ownerManager = manager;
@@ -120,7 +120,7 @@ public class UiCircleComponent : MonoBehaviour, IBeginDragHandler, IDragHandler,
 
         if (ownerManager != null)
         {
-            ownerManager.CheckClearCondition();
+            ownerManager.CheckClear();
         }
     }
 

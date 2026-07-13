@@ -4,23 +4,23 @@ using UnityEngine;
 public abstract class BasePuzzleManager : MonoBehaviour
 {
     [Header("Puzzle Base Settings")]
-    [SerializeField] protected float itemSpacing = 1.2f;
+    [SerializeField] protected float itemSpacing;
 
-    public event Action OnPuzzleClearedEvent;
+    public event Action OnPuzzleCleared;
 
     public bool IsClear { get; protected set; } = false;
 
     protected virtual void Start()
     {
-        InitializePuzzle();
+        InitPuzzle();
     }
 
-    public abstract void InitializePuzzle();
-    public abstract void CheckClearCondition();
+    public abstract void InitPuzzle();
+    public abstract void CheckClear();
     protected abstract void OnPuzzleClear();
 
     protected void TriggerClearEvent()
     {
-        OnPuzzleClearedEvent?.Invoke();
+        OnPuzzleCleared?.Invoke();
     }
 }

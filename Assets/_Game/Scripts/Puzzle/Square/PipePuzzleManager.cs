@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 
-public class PipeManager : BasePuzzleManager
+public class PipePuzzleManager : BasePuzzleManager
 {
     [Header("Text File Path Settings")]
     [SerializeField] private string stageFileName = "Stage01";
@@ -35,7 +35,7 @@ public class PipeManager : BasePuzzleManager
     private bool isDirectionSet = false;
     private Vector2 dragStartScreenPos;
 
-    public override void InitializePuzzle()
+    public override void InitPuzzle()
     {
         LoadAndGeneratePuzzle();
     }
@@ -282,11 +282,11 @@ public class PipeManager : BasePuzzleManager
 
         if (stageClearDetected && !IsClear)
         {
-            CheckClearCondition();
+            CheckClear();
         }
     }
 
-    public override void CheckClearCondition()
+    public override void CheckClear()
     {
         IsClear = true;
         OnPuzzleClear();

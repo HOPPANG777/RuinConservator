@@ -10,7 +10,7 @@ public class PipeComponent : MonoBehaviour, IPointerClickHandler, IBeginDragHand
     public bool IsWatered { get; set; } = false;
 
     private Image tileImage;
-    private PipeManager ownerSpawner;
+    private PipePuzzleManager ownerSpawner;
     private RectTransform rectTransform;
 
     private void Awake()
@@ -19,7 +19,7 @@ public class PipeComponent : MonoBehaviour, IPointerClickHandler, IBeginDragHand
         rectTransform = GetComponent<RectTransform>();
     }
 
-    public void Setup(PipeData tileData, int r, int c, PipeManager spawner)
+    public void Setup(PipeData tileData, int r, int c, PipePuzzleManager spawner)
     {
         Data = tileData;
         Row = r;

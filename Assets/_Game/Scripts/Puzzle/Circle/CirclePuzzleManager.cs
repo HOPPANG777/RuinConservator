@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class UiCirclePuzzleManager : BasePuzzleManager
+public class CirclePuzzleManager : BasePuzzleManager
 {
     [Header("UI Grid Parent Settings")]
     [SerializeField] private RectTransform gridParent;
@@ -21,7 +21,7 @@ public class UiCirclePuzzleManager : BasePuzzleManager
 
     private List<UiCircleComponent> spawnedRings = new List<UiCircleComponent>();
 
-    public override void InitializePuzzle()
+    public override void InitPuzzle()
     {
         LoadAndGeneratePuzzle();
     }
@@ -77,7 +77,7 @@ public class UiCirclePuzzleManager : BasePuzzleManager
         }
     }
 
-    public override void CheckClearCondition()
+    public override void CheckClear()
     {
         if (spawnedRings == null || spawnedRings.Count == 0) return;
 

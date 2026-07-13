@@ -8,9 +8,9 @@ public class UiLightTileComponent : MonoBehaviour, IPointerClickHandler
     public bool IsOn { get; private set; }
 
     private Image tileImage;
-    private UiLightPuzzleManager ownerManager;
+    private LightPuzzleManager ownerManager;
 
-    public void Init(int tileId, bool initialState, UiLightPuzzleManager manager)
+    public void Init(int tileId, bool initialState, LightPuzzleManager manager)
     {
         Id = tileId;
         IsOn = initialState;

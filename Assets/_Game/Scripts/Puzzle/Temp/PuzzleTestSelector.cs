@@ -7,7 +7,7 @@ public class PuzzleTestSelector : MonoBehaviour
     public struct PuzzleUiEntry
     {
         public string puzzleName;
-        public UiPuzzlePopup puzzlePopup;
+        public PuzzlePopup puzzlePopup;
     }
 
     [Header("테스트할 UI 팝업 퍼즐 리스트")]

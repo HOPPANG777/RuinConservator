@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class UiLightPuzzleManager : BasePuzzleManager
+public class LightPuzzleManager : BasePuzzleManager
 {
     [Header("UI Grid Parent Settings")]
     [SerializeField] private RectTransform gridParent;
@@ -16,7 +16,7 @@ public class UiLightPuzzleManager : BasePuzzleManager
     private Dictionary<int, UiLightTileComponent> spawnedTiles = new Dictionary<int, UiLightTileComponent>();
     private LightStageParsedData currentRuntimeData;
 
-    public override void InitializePuzzle()
+    public override void InitPuzzle()
     {
         GenerateLightPuzzle();
     }
@@ -87,10 +87,10 @@ public class UiLightPuzzleManager : BasePuzzleManager
             }
         }
 
-        CheckClearCondition();
+        CheckClear();
     }
 
-    public override void CheckClearCondition()
+    public override void CheckClear()
     {
         foreach (var tile in spawnedTiles.Values)
         {

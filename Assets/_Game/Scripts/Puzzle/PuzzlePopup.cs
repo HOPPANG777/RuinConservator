@@ -2,39 +2,36 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections; 
 
-public class UiPuzzlePopup : MonoBehaviour
+// 퍼즐 UI 열림, 닿힘
+public class PuzzlePopup : MonoBehaviour
 {
     [Header("UI Windows")]
     [SerializeField] private GameObject popupContainer; 
-    [SerializeField] private Button closeButton;      
+    [SerializeField] private Button closeBtn;      
 
     [Header("Puzzle Managers Inside UI")]
-    [SerializeField] private BasePuzzleManager uiPuzzleManager;
+    [SerializeField] private BasePuzzleManager puzzleManager;
 
     [Header("Clear Settings")]
-    [SerializeField] private float closeDelaySeconds = 1.0f;
+    [SerializeField] private float closeDelay = 1.0f;
 
     private Coroutine closeDelayCoroutine;
 
     private void Awake()
     {
-        if (closeButton != null)
-            closeButton.onClick.AddListener(ClosePopup);
+        if (closeBtn != null)
+            closeBtn.onClick.AddListener(ClosePopup);
 
-        if (uiPuzzleManager != null)
-        {
-            uiPuzzleManager.OnPuzzleClearedEvent += OnPuzzleCleared;
-        }
+        if (puzzleManager != null)
+            puzzleManager.OnPuzzleCleared += OnPuzzleCleared;
 
         ClosePopup();
     }
 
     private void OnDestroy()
     {
-        if (uiPuzzleManager != null)
-        {
-            uiPuzzleManager.OnPuzzleClearedEvent -= OnPuzzleCleared;
-        }
+        if (puzzleManager != null)
+            puzzleManager.OnPuzzleCleared -= OnPuzzleCleared;
     }
 
     public void OpenPuzzlePopup()
@@ -48,10 +45,10 @@ public class UiPuzzlePopup : MonoBehaviour
         if (popupContainer != null)
             popupContainer.SetActive(true);
 
-        if (uiPuzzleManager != null)
+        if (puzzleManager != null)
         {
-            uiPuzzleManager.enabled = true;
-            uiPuzzleManager.InitializePuzzle();
+            puzzleManager.enabled = true;
+            puzzleManager.InitPuzzle();
         }
     }
 
@@ -66,17 +63,17 @@ public class UiPuzzlePopup : MonoBehaviour
         if (popupContainer != null)
             popupContainer.SetActive(false);
 
-        if (uiPuzzleManager != null)
+        if (puzzleManager != null)
         {
-            uiPuzzleManager.enabled = false;
+            puzzleManager.enabled = false;
         }
     }
 
     private void OnPuzzleCleared()
     {
-        if (uiPuzzleManager != null)
+        if (puzzleManager != null)
         {
-            uiPuzzleManager.enabled = false;
+            puzzleManager.enabled = false;
         }
 
         if (gameObject.activeInHierarchy)
@@ -87,7 +84,7 @@ public class UiPuzzlePopup : MonoBehaviour
 
     private IEnumerator Co_DelayedClose()
     {
-        yield return new WaitForSeconds(closeDelaySeconds);
+        yield return new WaitForSeconds(closeDelay);
 
         if (popupContainer != null)
             popupContainer.SetActive(false);
