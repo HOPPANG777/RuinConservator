@@ -54,7 +54,7 @@ public class PipeManager : BasePuzzleManager
 
         if (!File.Exists(fullPath))
         {
-            Debug.LogError($"[UiPipeSpawner] 파일을 찾을 수 없습니다! 경로: {fullPath}");
+            Debug.LogError($"경로: {fullPath}");
             return;
         }
 
@@ -66,7 +66,6 @@ public class PipeManager : BasePuzzleManager
         cols = parsedData.cols;
         grid = new PipeComponent[rows, cols];
 
-        // UI 좌표계 배치: 패널 중심 기준 정렬 계산
         Vector3 startLocalPos = new Vector3(-(cols - 1) * itemSpacing / 2f, (rows - 1) * itemSpacing / 2f, 0);
 
         int dataIndex = 0;
@@ -115,8 +114,6 @@ public class PipeManager : BasePuzzleManager
         UpdateWaterFlow();
     }
 
-    // 타일 에서 호출하는 인터페이스 포워딩 시스템 
-
     public void OnTileBeginDrag(PipeComponent tile, Vector2 screenPos)
     {
         if (tile.Data.type == PipeType.Empty || tile.Data.type == PipeType.Start || tile.Data.type == PipeType.End) return;
@@ -162,16 +159,13 @@ public class PipeManager : BasePuzzleManager
         }
         else if (targetEmptyTile != null)
         {
-            // UI 로컬 벡터 기준 이동 거리 계산
             Vector3 dragAxis = emptyTileLocalPos - originalLocalPos;
             float maxDistance = dragAxis.magnitude;
             Vector3 moveDir = dragAxis.normalized;
 
-            // 스크린 델타 투영 연산
             Vector3 mouseMoveVector = (Vector3)(currentScreenPos - dragStartScreenPos);
             float dragProgress = Vector3.Dot(mouseMoveVector, moveDir);
 
-            // UI 캔버스 스케일링 보정 유연화 처리 
             dragProgress = Mathf.Clamp(dragProgress, 0f, maxDistance);
             selectedTile.GetComponent<RectTransform>().localPosition = originalLocalPos + moveDir * dragProgress;
         }

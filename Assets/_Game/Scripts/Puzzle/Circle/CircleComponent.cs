@@ -16,7 +16,6 @@ public class UiCircleComponent : MonoBehaviour, IBeginDragHandler, IDragHandler,
     private float startMouseAngle;
     private float startRingAngle;
 
-    // 오브젝트가 꺼져있을 때도 각도를 기억할 변수
     private float targetInitialAngle = 0f;
     private bool isInitialized = false;
 
@@ -25,20 +24,17 @@ public class UiCircleComponent : MonoBehaviour, IBeginDragHandler, IDragHandler,
         rectTransform = GetComponent<RectTransform>();
     }
 
-    // 매니저가 원을 생성할 때 호출하는 초기화 함수
     public void InitRingState(int totalSegments, GameObject patternPrefab, UiCirclePuzzleManager manager)
     {
         segments = totalSegments;
         ownerManager = manager;
         isInitialized = false;
 
-        // 1. 기존 문양 오브젝트 청소
         foreach (Transform child in transform)
         {
             Destroy(child.gameObject);
         }
 
-        // 2. 자식 문양 프리팹 생성 및 조립
         if (patternPrefab != null)
         {
             GameObject patternObj = Instantiate(patternPrefab, transform);
@@ -51,7 +47,6 @@ public class UiCircleComponent : MonoBehaviour, IBeginDragHandler, IDragHandler,
             }
         }
 
-        // 3. 각 원마다 독립적인 랜덤 회전 상태 연산
         int halfSegments = segments / 2;
         int randomOffset = 0;
         int safetyNet = 0;
@@ -65,18 +60,15 @@ public class UiCircleComponent : MonoBehaviour, IBeginDragHandler, IDragHandler,
         if (randomOffset == 0) randomOffset = 1;
         currentSegmentOffset = randomOffset;
 
-        // 4. 목표 회전 각도 미리 저장
         targetInitialAngle = currentSegmentOffset * AnglePerSegment;
         isInitialized = true;
 
-        // 만약 오브젝트가 이미 활성화되어 있다면 즉시 회전 적용
         if (gameObject.activeInHierarchy)
         {
             ApplyInitialRotation();
         }
     }
 
-    // ⭐ [핵심 해결책] 게임 오브젝트가 켜지는 시점(OnEnable)에 유니티 UI 리셋을 무시하고 최종 회전을 먹입니다.
     private void OnEnable()
     {
         if (isInitialized)
@@ -88,10 +80,8 @@ public class UiCircleComponent : MonoBehaviour, IBeginDragHandler, IDragHandler,
     private void ApplyInitialRotation()
     {
         SetVisualRotation(targetInitialAngle);
-        Debug.Log($"[{gameObject.name}] 부모 원 자체 회전 완료 (OnEnable 안전제어) - 오프셋: {currentSegmentOffset}, 회전각도: {targetInitialAngle}°");
     }
 
-    // 부모 원(rectTransform) 자체를 회전시킵니다.
     public void SetVisualRotation(float angle)
     {
         if (rectTransform != null)
@@ -100,7 +90,6 @@ public class UiCircleComponent : MonoBehaviour, IBeginDragHandler, IDragHandler,
         }
     }
 
-    // --- 마우스 드래그 핸들러 시스템 (부모 원 기준 회전 연산) ---
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (ownerManager != null && ownerManager.IsClear) return;

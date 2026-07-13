@@ -8,7 +8,7 @@ public static class LightPuzzleParser
     {
         if (string.IsNullOrEmpty(textData))
         {
-            Debug.LogError("[LightParser] 텍스트 데이터가 비어있습니다.");
+            Debug.LogError("텍스트 데이터가 비어있습니다");
             return null;
         }
 
@@ -26,7 +26,7 @@ public static class LightPuzzleParser
 
             if (validLines.Count < 2)
             {
-                Debug.LogError($"[LightParser] 유효한 데이터 라인이 부족합니다. (현재 인식된 라인 수: {validLines.Count})");
+                Debug.LogError($"현재 인식된 라인 수: {validLines.Count}");
                 return null;
             }
 
@@ -60,7 +60,7 @@ public static class LightPuzzleParser
         }
         catch (Exception e)
         {
-            Debug.LogError($"[LightParser 예외] 데이터 해석 오류: {e.Message}");
+            Debug.LogError($"데이터 해석 오류: {e.Message}");
             return null;
         }
     }

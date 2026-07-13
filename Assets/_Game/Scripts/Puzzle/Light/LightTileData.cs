@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class LightTileRawData
 {
     public int id;
-    public int initialState; // 0 = OFF, 1 = ON
+    public int initialState; 
     public List<int> targetIds = new List<int>();
 }
 

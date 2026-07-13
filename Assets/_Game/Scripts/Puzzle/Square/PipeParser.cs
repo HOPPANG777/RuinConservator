@@ -24,17 +24,14 @@ public static class PipeParser
 
             PipeStageParsedData stageData = new PipeStageParsedData();
 
-            // 크기 파싱
             string[] sizeTokens = validLines[0].Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
             stageData.rows = int.Parse(sizeTokens[0]);
             stageData.cols = int.Parse(sizeTokens[1]);
 
-            // 타일 데이터들 행 단위 파싱
             for (int i = 1; i < validLines.Count; i++)
             {
                 string[] tokens = validLines[i].Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
-                // 가로로 나열된 토큰들을 2개씩 쌍으로 묶어서 처리 (타일타입, 회전)
                 for (int j = 0; j < tokens.Length; j += 2)
                 {
                     if (j + 1 >= tokens.Length) break;
@@ -51,7 +48,7 @@ public static class PipeParser
         }
         catch (Exception e)
         {
-            Debug.LogError($"[PipeParser 예외] {e.Message}");
+            Debug.LogError($"예외 {e.Message}");
             return null;
         }
     }
