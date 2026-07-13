@@ -1,0 +1,7 @@
+# Circle Puzzle Stage 01
+
+# PrefabIndex Segments
+0 8
+0 8
+0 8
+0 8
