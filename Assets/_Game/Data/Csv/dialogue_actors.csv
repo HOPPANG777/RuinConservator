@@ -1,0 +1,3 @@
+actor_id,display_name_key,default_portrait_id
+ACTOR_PLAYER,actor.player.name,NORMAL
+ACTOR_CURATOR,actor.curator.name,NORMAL

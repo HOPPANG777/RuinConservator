@@ -119,7 +119,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef4c605b3bec4800b1490e00529fa1e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::QuestController
-  _questDatabase: []
 --- !u!1 &215046363329499873
 GameObject:
   m_ObjectHideFlags: 0
@@ -376,6 +375,7 @@ GameObject:
   - component: {fileID: 4132607794765692391}
   - component: {fileID: 7413104067889454957}
   - component: {fileID: 7413104067889454958}
+  - component: {fileID: 7413104067889454959}
   m_Layer: 0
   m_Name: GameRoot
   m_TagString: Untagged
@@ -416,11 +416,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameRoot
   _cameraController: {fileID: 3506346225531343242}
+  _gameDataController: {fileID: 7413104067889454959}
   _progressController: {fileID: 7413104067889454957}
   _questController: {fileID: 4612708442974497604}
   _dialogueController: {fileID: 5682704680682971946}
   _stageFlowController: {fileID: 6413104067889454956}
   _sceneStateBridge: {fileID: 7413104067889454958}
+--- !u!114 &7413104067889454959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1008359294462020877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45c13e38e9184fb6a9b7e999b02d2c56, type: 3}
+  m_Name: ''
+  m_EditorClassIdentifier: Assembly-CSharp::GameDataController
+  _dialogueActorsCsv: {fileID: 4900000, guid: bffed1b5ea624a369cd6ed09df2af378, type: 3}
+  _dialoguePortraitsCsv: {fileID: 4900000, guid: 14c0126947254b858c7d5d65e6003c4c, type: 3}
+  _dialogueGraphsCsv: {fileID: 4900000, guid: 356b65da296c47b3a19886e0500180a6, type: 3}
+  _dialogueNodesCsv: {fileID: 4900000, guid: 9adf76f4c84d474f90721aad52c8244f, type: 3}
+  _dialogueChoicesCsv: {fileID: 4900000, guid: 58fb3e12631f488fa6fb61bf092de93c, type: 3}
+  _questsCsv: {fileID: 4900000, guid: c1f36fd7ba2e4aa5b79c83d3c8a8fe5a, type: 3}
+  _questObjectivesCsv: {fileID: 4900000, guid: 5f7a71454ce945f1b4dc9e4272dafcf2, type: 3}
+  _questRewardsCsv: {fileID: 4900000, guid: cd3b903b12b34bcd91625ded3124dc28, type: 3}
+  _questConsumeItemsCsv: {fileID: 4900000, guid: 2f504f6a485d45dc8b7b004b70981a59, type: 3}
+  _localizationCsv: {fileID: 4900000, guid: 194e1754a89b4cb8bb743e65d69e0c5d, type: 3}
+  _language: 0
+  _npcDialogueBindingsCsv: {fileID: 4900000, guid: 29e6c4c00505451b9c1300aa801e6542, type: 3}
+  _npcQuestDialogueRoutesCsv: {fileID: 4900000, guid: 17b66e402ae14c2a964712bfa770a632, type: 3}
 --- !u!114 &7413104067889454957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1990,6 +2016,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueController
   _dialogueView: {fileID: 3872903375073207988}
+  _visualCatalog: {fileID: 11400000, guid: 9eb119a0c4e04becb168402d6d75cb65, type: 2}
   _advanceAction: {fileID: 1781555164194001046, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   _lockPlayerControl: 1
   _playerInteractionController: {fileID: 0}

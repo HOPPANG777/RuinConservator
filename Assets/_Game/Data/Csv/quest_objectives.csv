@@ -1,0 +1,3 @@
+quest_id,objective_order,objective_id,description_text_key,required_progress_flag_id,required_flag_value
+QUEST_RESTORE_MURAL,0,OBJECTIVE_INSPECT_MURAL,quest.restore_mural.objective.inspect,FLAG_MURAL_INSPECTED,true
+QUEST_RESTORE_MURAL,1,OBJECTIVE_REPORT_DAMAGE,quest.restore_mural.objective.report,FLAG_MURAL_DAMAGE_REPORTED,true

@@ -419,10 +419,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75287c4171c640fc842c6464c69660ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcDialogueInteractable
-  _dialogueGraph: {fileID: 11400000, guid: 014e39b73d88b8b4faa7af3ccfef4750, type: 2}
-  _actorOverride: {fileID: 11400000, guid: fb1303c0a9b1d34498f455456a56d9da, type: 2}
-  _dialogueController: {fileID: 1632189813}
-  _questDialogueRoutes: []
+  _npcId: NPC_CURATOR
   _highlightObject: {fileID: 2003443730}
   _hideHighlightOnAwake: 1
 --- !u!212 &292303624
