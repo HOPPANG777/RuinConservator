@@ -1,9 +1,18 @@
-using UnityEngine;
-
+//==============================================================================
+// 기능: enum::QuestState
+// 설명: 퀘스트 진행 단계 상태
+//==============================================================================
 public enum QuestState
 {
-    QUEST_NOT_STARTED = 0,      // 미수락 (시작하지 않음)
-    QUEST_IN_PROGRESS,          // 진행중
-    QUEST_COMPLETED,            // 목표 달성 (완료 됨)
-    QUEST_REWARDED              // 보상 수령 완료 (보상 받음)
+    // 아직 수락하지 않은 퀘스트 상태입니다.
+    QUEST_NOT_STARTED = 0,
+
+    // 수락 후 목표를 진행하고 있는 퀘스트 상태입니다.
+    QUEST_IN_PROGRESS,
+
+    // 모든 목표를 달성하고 완료가 확정된 퀘스트 상태입니다.
+    QUEST_COMPLETED,
+
+    // 완료 보상 수령까지 끝난 퀘스트 상태입니다.
+    QUEST_REWARDED
 }
