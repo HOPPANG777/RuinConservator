@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 //==============================================================================
 // 기능: class::QuestCsvDefinitionLoader
-// 설명: 네 개 Quest CSV를 목표와 보상이 포함된 Quest Definition 목록으로 조립하는 도메인 로더
+// 설명: 런타임과 에디터에서 네 개 Quest CSV를 목표와 보상이 포함된 Quest Definition 목록으로 조립하는 로더
 //==============================================================================
-internal static class QuestCsvDefinitionLoader
+public static class QuestCsvDefinitionLoader
 {
     // Quests CSV에서 허용하는 정확한 헤더 목록입니다.
     private static readonly string[] QUEST_HEADERS = { "quest_id", "title_text_key", "description_text_key", "owner_npc_id" };
@@ -44,7 +44,7 @@ internal static class QuestCsvDefinitionLoader
     /// <param name="definitions">변환된 Quest Definition 목록입니다.</param>
     /// <param name="loadError">변환을 중단시킨 첫 번째 오류입니다.</param>
     /// <returns>모든 Quest CSV를 정상적으로 조립했으면 true입니다.</returns>
-    internal static bool TryLoad(
+    public static bool TryLoad(
         GameDataCsvSource source,
         out List<QuestDefinition> definitions,
         out GameDataCsvLoadError loadError)

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 //==============================================================================
 // 기능: class::DialogueCsvDefinitionLoader
-// 설명: 다섯 개 Dialogue CSV를 화자와 그래프 Definition 목록으로 조립하는 도메인 로더
+// 설명: 런타임과 에디터에서 다섯 개 Dialogue CSV를 화자와 그래프 Definition 목록으로 조립하는 로더
 //==============================================================================
-internal static class DialogueCsvDefinitionLoader
+public static class DialogueCsvDefinitionLoader
 {
     // DialogueActors CSV에서 허용하는 정확한 헤더 목록입니다.
     private static readonly string[] ACTOR_HEADERS = { "actor_id", "display_name_key", "default_portrait_id" };
@@ -30,7 +30,7 @@ internal static class DialogueCsvDefinitionLoader
     /// <param name="graphDefinitions">변환된 대화 그래프 Definition 목록입니다.</param>
     /// <param name="loadError">변환을 중단시킨 첫 번째 오류입니다.</param>
     /// <returns>모든 Dialogue CSV를 정상적으로 조립했으면 true입니다.</returns>
-    internal static bool TryLoad(
+    public static bool TryLoad(
         GameDataCsvSource source,
         out List<DialogueActorDefinition> actorDefinitions,
         out List<DialogueGraphDefinition> graphDefinitions,
