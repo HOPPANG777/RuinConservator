@@ -419,7 +419,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75287c4171c640fc842c6464c69660ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcDialogueInteractable
-  _npcId: 
+  _npcId: NPC_CURATOR
   _highlightObject: {fileID: 2003443730}
   _hideHighlightOnAwake: 1
 --- !u!212 &292303624

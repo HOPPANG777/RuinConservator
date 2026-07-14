@@ -21,4 +21,6 @@ MonoBehaviour:
     _sprite: {fileID: 21300000, guid: f5b62535ac7882b4db35684896240c1a, type: 3}
   - _assetId: SPR_CURATOR_HAPPY
     _sprite: {fileID: 21300000, guid: f5b62535ac7882b4db35684896240c1a, type: 3}
-  _backgroundSprites: []
+  _backgroundSprites:
+  - _assetId: 
+    _sprite: {fileID: 0}
