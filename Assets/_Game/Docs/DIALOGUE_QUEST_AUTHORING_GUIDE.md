@@ -173,10 +173,10 @@ quest_rewards.csv / quest_consume_items.csv의 item_id
 5. `Tools > Ruin Conservator > CSV 데이터 검증기`를 실행합니다.
 6. 오류를 모두 수정합니다.
 7. Unity Test Runner의 Edit Mode에서 `GameDataCsvRegressionTests`를 실행합니다.
-8. Play Mode에서 실제 대화와 퀘스트 흐름을 확인합니다.
+8. Play 버튼을 누르고 사전 검증을 통과한 뒤 실제 대화와 퀘스트 흐름을 확인합니다.
 9. 플레이어 빌드를 실행합니다.
 
-빌드 직전에도 동일한 검증기가 자동 실행되며 오류가 있으면 빌드를 중단합니다.
+Play Mode 진입 직전과 플레이어 빌드 직전에 동일한 검증기가 자동 실행됩니다. 오류가 있으면 각각 Play Mode 진입 또는 빌드를 중단하며, 경고만 있으면 작업을 계속할 수 있습니다.
 
 ## 11. 완료 체크리스트
 
