@@ -660,6 +660,14 @@ internal static class GameDataEditorValidator
             {
                 report.AddError("InventoryController", $"아이템 데이터베이스 ItemId가 중복되었습니다. itemId={itemId}", itemData);
             }
+
+            if (itemData.Icon == null)
+            {
+                report.AddWarning(
+                    "InventoryController",
+                    $"ItemDataSO 아이콘이 연결되지 않았습니다. itemId={itemId}",
+                    itemData);
+            }
         }
 
         return itemIds;

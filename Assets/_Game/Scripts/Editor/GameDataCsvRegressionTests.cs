@@ -21,6 +21,23 @@ public sealed class GameDataCsvRegressionTests
     // 잘못된 헤더 테스트에서 정상 헤더를 대체하는 잘못된 이름입니다.
     private const string INVALID_ACTOR_ID_HEADER = "actor_code";
 
+    // 제거된 레거시 Dialogue와 Quest ScriptableObject 타입 이름 목록입니다.
+    private static readonly string[] LEGACY_TYPE_NAMES =
+    {
+        "DialogueActorSO",
+        "DialogueGraphSO",
+        "QuestDataSO"
+    };
+
+    // 제거된 레거시 Dialogue와 Quest 테스트 에셋 경로 목록입니다.
+    private static readonly string[] LEGACY_ASSET_PATHS =
+    {
+        "Assets/_Game/Data/DialogueData/TestNPC/PlayerDialogueActor.asset",
+        "Assets/_Game/Data/DialogueData/TestNPC/TestDialogueActor.asset",
+        "Assets/_Game/Data/DialogueData/TestNPC/TestDialogueGraph.asset",
+        "Assets/_Game/Data/QuestData/QuestData.asset"
+    };
+
     //==============================================================================
     // 회귀 테스트
     //==============================================================================
@@ -89,6 +106,42 @@ public sealed class GameDataCsvRegressionTests
         Assert.That(loadError, Is.Not.Null);
         Assert.That(loadError.SourceName, Is.EqualTo(runtimeSource.DialogueActors.SourceName));
         Assert.That(loadError.RecordNumber, Is.EqualTo(1));
+    }
+
+    /// <summary>
+    /// CSV 전환이 끝난 Dialogue와 Quest 레거시 ScriptableObject 타입이 런타임 어셈블리에 없는지 검증합니다.
+    /// </summary>
+    [Test]
+    public void LegacyDialogueAndQuestTypesAreRemoved()
+    {
+        System.Reflection.Assembly runtimeAssembly = typeof(GameDataController).Assembly;
+
+        for (int i = 0; i < LEGACY_TYPE_NAMES.Length; i++)
+        {
+            System.Type legacyType = runtimeAssembly.GetType(LEGACY_TYPE_NAMES[i]);
+
+            Assert.That(
+                legacyType,
+                Is.Null,
+                $"제거된 레거시 타입이 다시 추가되었습니다. type={LEGACY_TYPE_NAMES[i]}");
+        }
+    }
+
+    /// <summary>
+    /// 제거된 Dialogue와 Quest 레거시 테스트 에셋이 프로젝트에 다시 포함되지 않았는지 검증합니다.
+    /// </summary>
+    [Test]
+    public void LegacyDialogueAndQuestAssetsAreRemoved()
+    {
+        for (int i = 0; i < LEGACY_ASSET_PATHS.Length; i++)
+        {
+            Object legacyAsset = AssetDatabase.LoadAssetAtPath<Object>(LEGACY_ASSET_PATHS[i]);
+
+            Assert.That(
+                legacyAsset,
+                Is.Null,
+                $"제거된 레거시 에셋이 다시 추가되었습니다. path={LEGACY_ASSET_PATHS[i]}");
+        }
     }
 
     //==============================================================================

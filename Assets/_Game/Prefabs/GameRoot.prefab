@@ -533,6 +533,7 @@ Transform:
   - {fileID: 1014609535719787170}
   - {fileID: 8585077351130699641}
   - {fileID: 2878542185971289226}
+  - {fileID: 9012345678901234501}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4132607794765692391
@@ -551,11 +552,58 @@ MonoBehaviour:
   _gameDataController: {fileID: 5787683473583654242}
   _progressController: {fileID: 3253425018199022226}
   _questController: {fileID: 4612708442974497604}
-  _inventoryController: {fileID: 0}
+  _inventoryController: {fileID: 9012345678901234567}
   _inventoryPresenter: {fileID: 0}
   _dialogueController: {fileID: 5682704680682971946}
   _stageFlowController: {fileID: 6413104067889454956}
   _sceneStateBridge: {fileID: 2285303300801334074}
+--- !u!1 &9012345678901234500
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9012345678901234501}
+  - component: {fileID: 9012345678901234567}
+  m_Layer: 0
+  m_Name: InventoryController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9012345678901234501
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9012345678901234500}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2305819821877646456}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9012345678901234567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9012345678901234500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be5adba16a474dbeab5bb5b5cf9bc7c8, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryController
+  _itemDatabase:
+  - {fileID: 11400000, guid: 66c8e0a2b4d64f1891a3c5e7f9b1d3a5, type: 2}
+  - {fileID: 11400000, guid: 77d9f1b3c5e74a2092b4d6f8a0c2e4b6, type: 2}
 --- !u!1 &1026423296325697472
 GameObject:
   m_ObjectHideFlags: 0
