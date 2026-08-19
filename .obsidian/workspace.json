@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "8a9af3a0995530e8",
+        "id": "ac092d7217477b23",
         "type": "tabs",
         "children": [
           {
-            "id": "bcead2a7796f29b8",
+            "id": "be24589894b2f556",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Docs/DESIGNER_CSV_AUTHORING_SPEC.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "DESIGNER_CSV_AUTHORING_SPEC"
+              "title": "새 탭"
             }
           }
         ]
@@ -183,8 +179,9 @@
       "bases:새 베이스 생성하기": false
     }
   },
-  "active": "bcead2a7796f29b8",
+  "active": "be24589894b2f556",
   "lastOpenFiles": [
+    "Docs/DESIGNER_CSV_AUTHORING_SPEC.md",
     "Temp/DefinitionCompileCheck/obj/Debug/netstandard2.1/fne1gs1v.oyr~",
     "Temp/DefinitionCompileCheck/obj/Debug/netstandard2.1/y2dqcgnh.0cv~",
     "Assets/_Game/Scripts/Gameplay/Data/Csv/GameDataCsvLoader.cs.meta",
@@ -195,7 +192,6 @@
     "Assets/_Game/Scripts/Gameplay/Data/Csv/QuestCsvDefinitionLoader.cs",
     "Assets/_Game/Scripts/Gameplay/Data/Csv/DialogueCsvDefinitionLoader.cs.meta",
     "Assets/_Game/Scripts/Gameplay/Data/Csv/DialogueCsvDefinitionLoader.cs",
-    "Assets/_Game/Scripts/Gameplay/Data/Csv/LocalizationCsvDefinitionLoader.cs.meta",
     "Temp/CodexCsvUnit1/guide_contact_sheet.png",
     "Temp/CodexCsvUnit1/guide_previews/15_InvalidExamples.png",
     "Temp/CodexCsvUnit1/guide_previews/14_NpcQuestDialogueRoutes.png",
