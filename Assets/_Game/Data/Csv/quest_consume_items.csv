@@ -1,0 +1,2 @@
+quest_id,consume_order,item_id,item_amount
+QUEST_RESTORE_MURAL,0,ITEM_REPAIR_KIT,1

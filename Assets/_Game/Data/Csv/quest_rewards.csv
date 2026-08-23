@@ -1,0 +1,3 @@
+quest_id,reward_order,reward_id,description_text_key,progress_flag_id,flag_value,item_id,item_amount
+QUEST_RESTORE_MURAL,0,REWARD_REPUTATION,quest.restore_mural.reward.reputation,FLAG_CURATOR_TRUSTED,true,,
+QUEST_RESTORE_MURAL,1,REWARD_COINS,quest.restore_mural.reward.coins,,,ITEM_COIN,100

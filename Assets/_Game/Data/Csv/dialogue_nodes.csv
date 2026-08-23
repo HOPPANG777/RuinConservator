@@ -1,0 +1,5 @@
+graph_id,node_id,actor_id,portrait_id,background_id,body_text_key,next_node_id
+DLG_CURATOR_INTRO,NODE_START,ACTOR_CURATOR,WORRIED,,dialogue.curator.intro.001,
+DLG_CURATOR_INTRO,NODE_ACCEPTED,ACTOR_CURATOR,NORMAL,,dialogue.curator.intro.accepted,
+DLG_CURATOR_IN_PROGRESS,NODE_PROGRESS,ACTOR_CURATOR,WORRIED,,dialogue.curator.progress.001,
+DLG_CURATOR_COMPLETE,NODE_COMPLETE,ACTOR_CURATOR,HAPPY,,dialogue.curator.complete.001,

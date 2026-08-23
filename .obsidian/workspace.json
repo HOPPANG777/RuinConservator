@@ -1,0 +1,235 @@
+{
+  "main": {
+    "id": "d395c73272af1394",
+    "type": "split",
+    "children": [
+      {
+        "id": "8a9af3a0995530e8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "bcead2a7796f29b8",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Docs/DESIGNER_CSV_AUTHORING_SPEC.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "DESIGNER_CSV_AUTHORING_SPEC"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "dfd5d193d4b43c21",
+    "type": "split",
+    "children": [
+      {
+        "id": "fc0360e4cf01d7be",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "73cfd3fb9ebedb98",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "파일 탐색기"
+            }
+          },
+          {
+            "id": "345071f31979dbb4",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "검색"
+            }
+          },
+          {
+            "id": "3e1a432020e66d59",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "북마크"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "2ac06a226ad8fac2",
+    "type": "split",
+    "children": [
+      {
+        "id": "65b03e884a795d77",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c2f9a64bd333b2e9",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Docs/DESIGNER_CSV_AUTHORING_SPEC.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "DESIGNER_CSV_AUTHORING_SPEC 의 백링크"
+            }
+          },
+          {
+            "id": "19787856a72ea387",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Docs/DESIGNER_CSV_AUTHORING_SPEC.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "DESIGNER_CSV_AUTHORING_SPEC 의 나가는 링크"
+            }
+          },
+          {
+            "id": "c8e0fc5fbb5c065a",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "태그"
+            }
+          },
+          {
+            "id": "49311d9384e1c08e",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "모든 속성"
+            }
+          },
+          {
+            "id": "d4a4bceddc2f80b5",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Docs/DESIGNER_CSV_AUTHORING_SPEC.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "DESIGNER_CSV_AUTHORING_SPEC 의 개요"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:빠른 전환기 열기": false,
+      "graph:그래프 뷰 열기": false,
+      "canvas:새 캔버스 만들기": false,
+      "daily-notes:오늘의 일일 노트 열기": false,
+      "templates:템플릿 삽입": false,
+      "command-palette:명령어 팔레트 열기": false,
+      "bases:새 베이스 생성하기": false
+    }
+  },
+  "active": "bcead2a7796f29b8",
+  "lastOpenFiles": [
+    "Temp/DefinitionCompileCheck/obj/Debug/netstandard2.1/fne1gs1v.oyr~",
+    "Temp/DefinitionCompileCheck/obj/Debug/netstandard2.1/y2dqcgnh.0cv~",
+    "Assets/_Game/Scripts/Gameplay/Data/Csv/GameDataCsvLoader.cs.meta",
+    "Assets/_Game/Scripts/Gameplay/Data/Csv/GameDataCsvLoader.cs",
+    "Assets/_Game/Scripts/Gameplay/Data/Csv/NpcDialogueCsvDefinitionLoader.cs.meta",
+    "Assets/_Game/Scripts/Gameplay/Data/Csv/NpcDialogueCsvDefinitionLoader.cs",
+    "Assets/_Game/Scripts/Gameplay/Data/Csv/QuestCsvDefinitionLoader.cs.meta",
+    "Assets/_Game/Scripts/Gameplay/Data/Csv/QuestCsvDefinitionLoader.cs",
+    "Assets/_Game/Scripts/Gameplay/Data/Csv/DialogueCsvDefinitionLoader.cs.meta",
+    "Assets/_Game/Scripts/Gameplay/Data/Csv/DialogueCsvDefinitionLoader.cs",
+    "Assets/_Game/Scripts/Gameplay/Data/Csv/LocalizationCsvDefinitionLoader.cs.meta",
+    "Temp/CodexCsvUnit1/guide_contact_sheet.png",
+    "Temp/CodexCsvUnit1/guide_previews/15_InvalidExamples.png",
+    "Temp/CodexCsvUnit1/guide_previews/14_NpcQuestDialogueRoutes.png",
+    "Temp/CodexCsvUnit1/guide_previews/13_NpcDialogueBindings.png",
+    "Temp/CodexCsvUnit1/guide_previews/12_Localization.png",
+    "Temp/CodexCsvUnit1/guide_previews/11_QuestConsumeItems.png",
+    "Temp/CodexCsvUnit1/guide_previews/10_QuestRewards.png",
+    "Temp/CodexCsvUnit1/guide_previews/09_QuestObjectives.png",
+    "Temp/CodexCsvUnit1/guide_previews/08_Quests.png",
+    "Temp/CodexCsvUnit1/guide_previews/07_DialogueChoices.png",
+    "Temp/CodexCsvUnit1/node_modules/@oai/artifact-tool/node_modules/string-split-by/readme.md",
+    "Temp/CodexCsvUnit1/node_modules/@oai/artifact-tool/node_modules/parenthesis/README.md",
+    "Temp/CodexCsvUnit1/node_modules/@oai/artifact-tool/node_modules/skia-canvas/README.md",
+    "Temp/CodexCsvUnit1/node_modules/@oai/artifact-tool/node_modules/https-proxy-agent/README.md",
+    "Temp/CodexCsvUnit1/node_modules/@oai/artifact-tool/node_modules/follow-redirects/README.md",
+    "Temp/CodexCsvUnit1/node_modules/@oai/artifact-tool/node_modules/detect-libc/README.md",
+    "Temp/CodexCsvUnit1/node_modules/@oai/artifact-tool/node_modules/ms/readme.md",
+    "Temp/CodexCsvUnit1/node_modules/@oai/artifact-tool/node_modules/ms/license.md",
+    "Temp/CodexCsvUnit1/node_modules/@oai/artifact-tool/node_modules/debug/README.md",
+    "Temp/CodexCsvUnit1/node_modules/@oai/artifact-tool/node_modules/agent-base/README.md",
+    "Temp/CodexCsvUnit1/node_modules/playwright/lib/agents/playwright-test-planner.agent.md",
+    "Temp/CodexCsvUnit1/node_modules/playwright/lib/agents/playwright-test-healer.agent.md",
+    "Temp/CodexCsvUnit1/node_modules/playwright/lib/agents/playwright-test-plan.prompt.md",
+    "Temp/CodexCsvUnit1/node_modules/playwright/lib/agents/playwright-test-heal.prompt.md",
+    "Temp/CodexCsvUnit1/node_modules/playwright/lib/agents/playwright-test-generator.agent.md",
+    "Temp/CodexCsvUnit1/node_modules/playwright/lib/agents/playwright-test-generate.prompt.md",
+    "Temp/CodexCsvUnit1/node_modules/playwright/lib/agents/playwright-test-coverage.prompt.md",
+    "Temp/CodexCsvUnit1/node_modules/tesseract.js/docs/workers_vs_schedulers.md",
+    "Temp/CodexCsvUnit1/node_modules/tesseract.js/docs/tesseract_lang_list.md",
+    "Temp/CodexCsvUnit1/node_modules/tesseract.js/docs/performance.md",
+    "Temp/CodexCsvUnit1/node_modules/tesseract.js/docs/local-installation.md",
+    "Temp/CodexCsvUnit1/node_modules/tesseract.js/docs/image-format.md",
+    "Temp/CodexCsvUnit1/node_modules/tesseract.js/docs/faq.md",
+    "Temp/CodexCsvUnit1/node_modules/tesseract.js/docs/api.md",
+    "Temp/CodexCsvUnit1/node_modules/tesseract.js/docs/examples.md"
+  ]
+}

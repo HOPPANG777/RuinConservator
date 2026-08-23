@@ -384,8 +384,8 @@ LeverInteractable:
 
 ```text
 Interact()
--> DialogueController 찾기
--> 퀘스트 상태에 맞는 DialogueGraphSO 선택
+-> GameRoot.Dialogue 조회
+-> NPC ID로 퀘스트 상태에 맞는 CSV graph_id 선택
 -> 대화 시작
 ```
 
@@ -393,10 +393,7 @@ Interact()
 
 | 필드 | 설명 |
 | --- | --- |
-| `Dialogue Graph` | 기본 대화입니다. |
-| `Actor Override` | 이 NPC가 사용할 기본 화자입니다. |
-| `Dialogue Controller` | 직접 연결할 DialogueController입니다. 비워두면 GameRoot.Dialogue를 사용합니다. |
-| `Quest Dialogue Routes` | 퀘스트 상태별 대화 목록입니다. |
+| `Npc Id` | `npc_dialogue_bindings.csv`의 `npc_id`와 일치하는 NPC 고유 ID입니다. |
 | `Highlight Object` | 포커스가 잡혔을 때 켜질 오브젝트입니다. |
 | `Hide Highlight On Awake` | 시작할 때 하이라이트를 숨길지 여부입니다. |
 
@@ -926,8 +923,9 @@ public void Interact()
 
 ```text
 NpcDialogueInteractable 사용
-Dialogue Graph 연결
-Quest Dialogue Routes 필요하면 설정
+Npc Id 입력
+npc_dialogue_bindings.csv에 기본 graph_id 연결
+npc_quest_dialogue_routes.csv에 퀘스트 상태별 경로 설정
 ```
 
 대화와 퀘스트는 직접 퍼즐 스크립트를 만들기보다 기존 `NpcDialogueInteractable`을 사용하세요.

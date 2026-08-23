@@ -1,0 +1,5 @@
+graph_id,node_id,choice_order,choice_text_key,next_node_id,action_type,action_id
+DLG_CURATOR_INTRO,NODE_START,0,dialogue.curator.choice.accept,NODE_ACCEPTED,ACCEPT_QUEST,QUEST_RESTORE_MURAL
+DLG_CURATOR_INTRO,NODE_START,1,dialogue.curator.choice.decline,,END_DIALOGUE,
+DLG_CURATOR_IN_PROGRESS,NODE_PROGRESS,0,dialogue.curator.choice.refresh,,REFRESH_QUEST_PROGRESS,QUEST_RESTORE_MURAL
+DLG_CURATOR_COMPLETE,NODE_COMPLETE,0,dialogue.curator.choice.reward,,CLAIM_QUEST_REWARD,QUEST_RESTORE_MURAL

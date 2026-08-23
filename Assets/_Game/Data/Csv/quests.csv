@@ -1,0 +1,2 @@
+quest_id,title_text_key,description_text_key,owner_npc_id
+QUEST_RESTORE_MURAL,quest.restore_mural.title,quest.restore_mural.description,NPC_CURATOR

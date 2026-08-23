@@ -1,238 +1,172 @@
 using UnityEngine;
 
-
-
 //==============================================================================
-
 // 기능: class::GameRoot
-
-// 설명: 현재 프로젝트 상에 하나 만 존재하는 매니저
-
+// 설명: 전역 컨트롤러의 참조와 초기화 순서를 관리하는 프로젝트 유일 싱글턴
 //==============================================================================
-
-// TODO: GameRoot에 들어가는 컨트롤러는 우리가 원래 매니저 라고 생각하는 컨트롤러들이 들어갑니다.
-
-// 예: SoundController, MapController, PoolController등
-
-//==============================================================================
-
-public class GameRoot : Singleton<GameRoot>
-
+public sealed class GameRoot : Singleton<GameRoot>
 {
-
+    //==============================================================================
+    // 직렬화 필드
     //==============================================================================
 
-    // 변수
-
-    //============================================================================== 
-
     [Header("Controller")]
+    [Tooltip("카메라 이동과 추적을 관리하는 컨트롤러입니다.")]
+    [SerializeField]
+    private CameraController _cameraController;
 
-    [Tooltip("카메라 컨트롤러입니다.")]
+    [Tooltip("CSV TextAsset을 읽어 게임 데이터 저장소를 생성하는 컨트롤러입니다.")]
+    [SerializeField]
+    private GameDataController _gameDataController;
 
-    [SerializeField] private CameraController _cameraController;
+    [Tooltip("게임 진행 상태와 플래그를 보관하는 컨트롤러입니다.")]
+    [SerializeField]
+    private ProgressController _progressController;
 
-    public CameraController CameraController { get => _cameraController; }
+    [Tooltip("퀘스트 상태 전환과 목표 및 보상 처리를 관리하는 컨트롤러입니다.")]
+    [SerializeField]
+    private QuestController _questController;
 
+    [Tooltip("아이템 보관과 중첩 및 소모를 관리하는 컨트롤러입니다.")]
+    [SerializeField]
+    private InventoryController _inventoryController;
 
-
-    [Header("Controller")]
-
-    [Tooltip("게임 진행 상태(플래그, 씬 오브젝트 상태)를 보관하는 컨트롤러입니다.")]
-
-    [SerializeField] private ProgressController _progressController;
-
-    // 외부에는 구현체가 아닌 인터페이스(IProgressService) 계약만 노출합니다.
-
-    public IProgressService Progress { get => _progressController; }
-
-
-
-    [Header("Controller")]
-
-    [Tooltip("퀘스트 상태 전환, 목표 갱신, 보상 지급을 관리하는 컨트롤러입니다.")]
-
-    [SerializeField] private QuestController _questController;
-
-    // 외부에는 구현체가 아닌 인터페이스(IQuestService) 계약만 노출합니다.
-
-    public IQuestService Quest { get => _questController; }
-
-
-
-    [Header("Controller")]
-
-    [Tooltip("아이템 보관, 중첩, 소모, 카테고리 조회를 관리하는 컨트롤러입니다.")]
-
-    [SerializeField] private InventoryController _inventoryController;
-
-    // 외부에는 구현체가 아닌 인터페이스(IInventoryService) 계약만 노출합니다.
-
-    public IInventoryService Inventory => _inventoryController;
-
-
-
-    [Header("Controller")]
-
-    [Tooltip("인벤토리 UI 열기, 닫기, 카테고리 전환, 선택 입력을 중개하는 Presenter입니다.")]
-
-    [SerializeField] private InventoryPresenter _inventoryPresenter;
-
-
-
-    [Header("Controller")]
+    [Tooltip("인벤토리 UI와 선택 입력을 중개하는 Presenter입니다.")]
+    [SerializeField]
+    private InventoryPresenter _inventoryPresenter;
 
     [Tooltip("NPC 대화 그래프 진행과 대화 UI를 관리하는 컨트롤러입니다.")]
+    [SerializeField]
+    private DialogueController _dialogueController;
 
-    [SerializeField] private DialogueController _dialogueController;
+    [Tooltip("씬과 스테이지 전환 흐름을 관리하는 컨트롤러입니다.")]
+    [SerializeField]
+    private StageFlowController _stageFlowController;
 
-    // 외부에는 구현체가 아닌 인터페이스(IDialogueService) 계약만 노출합니다.
-
-    public IDialogueService Dialogue { get => _dialogueController; }
-
-
-
-    [Header("Controller")]
-
-    [Tooltip("씬/스테이지 전환 흐름과 페이드 연출을 담당하는 컨트롤러입니다.")]
-
-    [SerializeField] private StageFlowController _stageFlowController;
-
-    // 외부에는 구현체가 아닌 인터페이스(IStageFlowService) 계약만 노출합니다.
-
-    public IStageFlowService StageFlow { get => _stageFlowController; }
-
-
-
-    [Header("Controller")]
-
-    [Tooltip("StageFlow Capture/Restore 이벤트와 Progress, 씬 오브젝트를 중개합니다.")]
-
-    [SerializeField] private SceneStateBridge _sceneStateBridge;
-
-
+    [Tooltip("씬 상태 Capture 및 Restore 이벤트를 진행 상태와 연결하는 브릿지입니다.")]
+    [SerializeField]
+    private SceneStateBridge _sceneStateBridge;
 
     //==============================================================================
+    // 공개 프로퍼티
+    //==============================================================================
 
-    // 함수
+    /// <summary>카메라 이동과 추적을 관리하는 컨트롤러입니다.</summary>
+    public CameraController CameraController => _cameraController;
 
-    //============================================================================== 
+    /// <summary>CSV에서 초기화된 읽기 전용 게임 데이터 저장소입니다.</summary>
+    public IGameDataRepository GameData => _gameDataController != null
+        ? _gameDataController.Repository
+        : null;
 
+    /// <summary>CSV 문장 Key를 현재 언어 문자열로 변환하는 계약입니다.</summary>
+    public ILocalizationService Localization => _gameDataController;
+
+    /// <summary>게임 진행 상태 시스템의 외부 공개 계약입니다.</summary>
+    public IProgressService Progress => _progressController;
+
+    /// <summary>퀘스트 시스템의 외부 공개 계약입니다.</summary>
+    public IQuestService Quest => _questController;
+
+    /// <summary>인벤토리 시스템의 외부 공개 계약입니다.</summary>
+    public IInventoryService Inventory => _inventoryController;
+
+    /// <summary>대화 시스템의 외부 공개 계약입니다.</summary>
+    public IDialogueService Dialogue => _dialogueController;
+
+    /// <summary>스테이지 전환 시스템의 외부 공개 계약입니다.</summary>
+    public IStageFlowService StageFlow => _stageFlowController;
+
+    //==============================================================================
+    // 유니티 생명주기
+    //==============================================================================
+
+    /// <summary>
+    /// 게임 데이터와 전역 컨트롤러를 의존 순서에 맞춰 초기화합니다.
+    /// </summary>
     private void Start()
-
     {
-
-        // 진행 상태 컨트롤러를 초기화합니다.
+        if (!TryInitializeGameData())
+        {
+            return;
+        }
 
         if (_progressController != null)
-
         {
-
             _progressController.Init();
-
         }
-
-
-
-        // 인벤토리 컨트롤러를 초기화합니다.
 
         if (_inventoryController != null)
-
         {
-
             _inventoryController.Init();
-
         }
-
-
-
-        // 인벤토리 UI Presenter를 초기화합니다.
 
         if (_inventoryPresenter != null)
-
         {
-
             _inventoryPresenter.Init(_inventoryController);
-
         }
-
-
-
-        // 퀘스트 컨트롤러를 초기화합니다.
 
         if (_questController != null)
-
         {
-
-            _questController.Init(_progressController, _inventoryController);
-
+            _questController.Init(GameData, _progressController, _inventoryController);
         }
-
-
-
-        // 대화 컨트롤러를 초기화합니다.
 
         if (_dialogueController != null)
-
         {
-
-            _dialogueController.Init();
-
+            _dialogueController.Init(
+                GameData,
+                _gameDataController,
+                _progressController,
+                _questController);
         }
-
-
-
-        // 스테이지 플로우 컨트롤러가 있으면 페이드/로딩 UI를 초기 상태로 정렬합니다.
 
         if (_stageFlowController == null)
-
         {
-
-            Debug.Log("StageFlowController가 없습니다.");
-
+            Debug.LogWarning("[GameRoot] StageFlowController가 연결되지 않았습니다.");
             return;
-
         }
-
-
 
         _stageFlowController.Init();
 
-
-
-        // Capture/Restore 중개 브릿지를 연결합니다.
-
         if (_sceneStateBridge != null && _progressController != null)
-
         {
-
             _sceneStateBridge.Init(_stageFlowController, _progressController);
-
         }
-
-
-
-        // 카메라 컨트롤러가 없으면 카메라 초기화만 건너뜁니다.
 
         if (_cameraController == null)
-
         {
-
-            Debug.Log("CameraController가 없습니다.");
-
+            Debug.LogWarning("[GameRoot] CameraController가 연결되지 않았습니다.");
             return;
-
         }
 
-
-
-        // 카메라 컨트롤러를 초기화합니다.
-
         _cameraController.Init();
-
     }
 
+    //==============================================================================
+    // 내부 로직
+    //==============================================================================
 
+    /// <summary>
+    /// CSV 게임 데이터 컨트롤러를 가장 먼저 초기화합니다.
+    /// </summary>
+    /// <returns>검증된 게임 데이터 저장소를 생성했으면 true입니다.</returns>
+    private bool TryInitializeGameData()
+    {
+        if (_gameDataController == null)
+        {
+            Debug.LogError("[GameRoot] GameDataController가 연결되지 않았습니다.");
+            return false;
+        }
 
+        if (_gameDataController.TryInit(out GameDataCsvLoadError loadError))
+        {
+            return true;
+        }
+
+        string errorMessage = loadError != null
+            ? loadError.ToString()
+            : "알 수 없는 CSV 게임 데이터 초기화 오류입니다.";
+        Debug.LogError($"[GameRoot] 게임 데이터 초기화에 실패했습니다. {errorMessage}");
+        return false;
+    }
 }
-

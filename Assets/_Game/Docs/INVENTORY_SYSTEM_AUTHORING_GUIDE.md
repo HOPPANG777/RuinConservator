@@ -328,7 +328,7 @@ TryAddItem(rice_wine, 30)
 현재 구현된 자동 소모:
 
 ```text
-QuestDataSO의 Consume Items
+quest_consume_items.csv의 아이템 소모 정의
 -> QuestController.TryCompleteQuest()
 -> IInventoryService.TryConsumeItem()
 ```
@@ -344,24 +344,22 @@ QuestDataSO의 Consume Items
 
 ## 11. 퀘스트 완료 시 아이템 소모 설정
 
-`QuestDataSO`에는 `Consume Items` 목록이 있습니다.
+퀘스트 완료 시 소모할 아이템은 `quest_consume_items.csv`에 작성합니다.
 
 필드:
 
 | 필드 | 설명 |
 | --- | --- |
-| `Consume Item Data` | 퀘스트 완료 확정 시 자동 소모할 아이템입니다. |
-| `Consume Item Amount` | 소모할 수량입니다. 1 이상이어야 합니다. |
+| `quest_id` | 아이템을 소모할 퀘스트 ID입니다. |
+| `consume_order` | 같은 퀘스트 안에서 소모 항목을 정렬하는 순서입니다. |
+| `item_id` | 퀘스트 완료 확정 시 자동 소모할 아이템 ID입니다. |
+| `item_amount` | 소모할 수량입니다. 1 이상이어야 합니다. |
 
 예:
 
 ```text
-QuestDataSO: Quest_OpenOldStorehouse
-
-Consume Items
-Element 0
-Consume Item Data: Item_OldKey
-Consume Item Amount: 1
+quest_id,consume_order,item_id,item_amount
+QUEST_OPEN_OLD_STOREHOUSE,0,quest_old_key,1
 ```
 
 동작:
@@ -386,33 +384,30 @@ old_key 0개
 
 ## 12. 퀘스트 보상으로 아이템 지급하기
 
-`QuestDataSO`의 `Rewards`에는 Progress flag 보상과 아이템 보상을 함께 넣을 수 있습니다.
+`quest_rewards.csv`에는 Progress flag 보상과 아이템 보상을 함께 작성할 수 있습니다.
 
 보상 필드:
 
 | 필드 | 설명 |
 | --- | --- |
-| `Reward Id` | 보상 고유 ID입니다. |
-| `Description` | 퀘스트 창에 표시할 보상 설명입니다. |
-| `Reward Progress Flag Id` | 보상 지급 시 변경할 Progress flag입니다. 비워둘 수 있습니다. |
-| `Reward Flag Value` | 저장할 flag 값입니다. 보통 `true`입니다. |
-| `Reward Item Data` | 보상으로 지급할 아이템입니다. 비워둘 수 있습니다. |
-| `Reward Item Amount` | 보상 아이템 지급 수량입니다. 1 이상이어야 합니다. |
+| `reward_id` | 같은 퀘스트 안에서 고유한 보상 ID입니다. |
+| `description_text_key` | 퀘스트 창에 표시할 보상 설명 문장 키입니다. |
+| `progress_flag_id` | 보상 지급 시 변경할 Progress flag입니다. 비워둘 수 있습니다. |
+| `flag_value` | 저장할 flag 값입니다. Progress flag가 없으면 비웁니다. |
+| `item_id` | 보상으로 지급할 아이템 ID입니다. 비워둘 수 있습니다. |
+| `item_amount` | 보상 아이템 지급 수량입니다. 1 이상이어야 합니다. |
 
 예:
 
 ```text
-Reward Id: reward_rice_wine
-Description: 쌀술 3개
-Reward Progress Flag Id: 비움
-Reward Item Data: Item_RiceWine
-Reward Item Amount: 3
+quest_id,reward_order,reward_id,description_text_key,progress_flag_id,flag_value,item_id,item_amount
+QUEST_RESTORE_MURAL,0,REWARD_RICE_WINE,quest.restore_mural.reward.rice_wine,,,item_rice_wine,3
 ```
 
 보상을 받으면:
 
 ```text
-IInventoryService.TryAddItem(Item_RiceWine, 3)
+IInventoryService.TryAddItem(item_rice_wine, 3)
 ```
 
 가 호출됩니다.
@@ -613,17 +608,13 @@ GameRoot
 -> Item_RiceWine 추가
 ```
 
-### 18-3. QuestDataSO 보상 설정
+### 18-3. Quest Rewards CSV 설정
 
-`QuestDataSO`의 `Rewards`:
+`quest_rewards.csv`:
 
 ```text
-Element 0
-Reward Id: reward_rice_wine
-Description: 쌀술 3개
-Reward Progress Flag Id: 비움
-Reward Item Data: Item_RiceWine
-Reward Item Amount: 3
+quest_id,reward_order,reward_id,description_text_key,progress_flag_id,flag_value,item_id,item_amount
+QUEST_RESTORE_MURAL,0,REWARD_RICE_WINE,quest.restore_mural.reward.rice_wine,,,item_rice_wine,3
 ```
 
 ### 18-4. 대화 선택지 연결
@@ -631,9 +622,9 @@ Reward Item Amount: 3
 퀘스트 완료 대화 선택지:
 
 ```text
-Choice Text: 보상을 받을게.
-Action Type: CLAIM_QUEST_REWARD
-Quest Data: 해당 퀘스트
+choice_text_key: dialogue.reward.claim
+action_type: CLAIM_QUEST_REWARD
+action_id: QUEST_RESTORE_MURAL
 ```
 
 결과:
@@ -641,8 +632,8 @@ Quest Data: 해당 퀘스트
 ```text
 선택지 클릭
 -> QuestController.TryClaimReward()
--> QuestDataSO.TryApplyRewards()
--> IInventoryService.TryAddItem(Item_RiceWine, 3)
+-> QuestDefinition의 보상 적용
+-> IInventoryService.TryAddItem(item_rice_wine, 3)
 -> 인벤토리에 쌀술 3개 추가
 ```
 
@@ -671,14 +662,13 @@ Item Type: ITEM_QUEST
 Max Stack Count: 99
 ```
 
-### 19-2. QuestDataSO 소모 설정
+### 19-2. Quest Consume Items CSV 설정
 
-`QuestDataSO`의 `Consume Items`:
+`quest_consume_items.csv`:
 
 ```text
-Element 0
-Consume Item Data: Item_OldKey
-Consume Item Amount: 1
+quest_id,consume_order,item_id,item_amount
+QUEST_OPEN_OLD_STOREHOUSE,0,quest_old_key,1
 ```
 
 ### 19-3. 완료 선택지 연결
@@ -686,9 +676,9 @@ Consume Item Amount: 1
 대화 선택지:
 
 ```text
-Choice Text: 열쇠로 창고를 열어볼게.
-Action Type: COMPLETE_QUEST
-Quest Data: 해당 퀘스트
+choice_text_key: dialogue.old_storehouse.complete
+action_type: COMPLETE_QUEST
+action_id: QUEST_OPEN_OLD_STOREHOUSE
 ```
 
 결과:
@@ -724,10 +714,10 @@ Quest Data: 해당 퀘스트
 - 중복 `ItemId`가 없는가?
 - GameRoot에 `InventoryController`가 연결되어 있는가?
 
-### QuestDataSO
+### Quest CSV
 
-- 아이템 보상이 필요하면 `Reward Item Data`와 `Reward Item Amount`가 들어가 있는가?
-- 완료 시 소모가 필요하면 `Consume Items`가 설정되어 있는가?
+- 아이템 보상이 필요하면 `quest_rewards.csv`의 `item_id`와 `item_amount`가 들어가 있는가?
+- 완료 시 소모가 필요하면 `quest_consume_items.csv`에 항목이 있는가?
 - 소모 수량이 1 이상인가?
 - 소모 아이템이 InventoryController의 Item Database에 등록되어 있는가?
 
@@ -749,8 +739,8 @@ Quest Data: 해당 퀘스트
 
 확인할 것:
 
-- `Reward Item Data`가 비어 있지 않은가?
-- `Reward Item Amount`가 1 이상인가?
+- `quest_rewards.csv`의 `item_id`가 비어 있지 않은가?
+- `item_amount`가 1 이상인가?
 - `ItemDataSO`의 `Item Id`가 비어 있지 않은가?
 - 퀘스트 보상 선택지가 `CLAIM_QUEST_REWARD`인가?
 - 이미 보상을 받은 퀘스트를 다시 받으려는 것은 아닌가?
@@ -775,8 +765,8 @@ Quest Data: 해당 퀘스트
 
 확인할 것:
 
-- `QuestDataSO`의 `Consume Items`에 아이템이 들어가 있는가?
-- `Consume Item Amount`가 1 이상인가?
+- `quest_consume_items.csv`에 아이템이 들어가 있는가?
+- `item_amount`가 1 이상인가?
 - 플레이어가 해당 아이템을 충분히 가지고 있는가?
 - 완료 선택지가 `COMPLETE_QUEST` 또는 보상 수령 흐름에서 완료를 거치는 구조인가?
 
@@ -810,8 +800,8 @@ Quest Data: 해당 퀘스트
 4. Icon, Display Name, Description, Price 입력
 5. Max Stack Count 확인
 6. InventoryController의 Item Database에 등록
-7. QuestDataSO의 Rewards 또는 Consume Items에 연결
-8. 대화 선택지에서 CLAIM_QUEST_REWARD 또는 COMPLETE_QUEST 연결
+7. quest_rewards.csv 또는 quest_consume_items.csv에 Item Id 작성
+8. dialogue_choices.csv에서 CLAIM_QUEST_REWARD 또는 COMPLETE_QUEST 연결
 9. 플레이해서 아이템 지급/소모 확인
 10. Tab으로 인벤토리 열기
 11. 전체/술/유물/기타 카테고리 표시 확인
